@@ -510,7 +510,7 @@ def get_direction(d):
 
 def pull():
 	with open('key.txt', 'r') as f:
-		key = f.open()
+		key = f.read()
 	os.system("curl -o cvtddata.txt http://cvtd.info:8080/CVTDfeed/V200/XML/_System.php?key={}".format(key))
 	tree = ET.parse('cvtddata.txt')
 	root = tree.getroot()
