@@ -2,6 +2,8 @@
 
 import math
 import os
+import threading
+import time
 import xml.etree.ElementTree as ET
 
 ROAD_LIST = [
@@ -58,6 +60,15 @@ ROAD_LIST = [
 	["Center St (UT-61), Lewiston", 41.975974, -111.846941, 41.976042, -111.837259, 400, 800, "E/W"],
 	["Center St (UT-61), Lewiston", 41.976042, -111.837259, 41.976117, -111.830585, 800, 1000, "E/W"],
 	["Center St (UT-61), Lewiston", 41.976117, -111.830585, 41.976055, -111.812862, 1000, 1150, "E/W"],
+	["100 S, Lewiston", 41.97379, -111.862267, 41.973828, -111.856665, -200, 0, "E/W"],
+	["100 W, Lewiston", 41.975883, -111.859502, 41.969589, -111.859416, 0, -300, "N/S"],
+	["Main St, Lewiston", 41.975913, -111.856661, 41.969623, -111.856616, 0, -300, "N/S"],
+
+# RICHMOND
+	["Main St, Richmond", 41.922708, -111.81435, 41.922513, -111.800289, -200, 300, "E/W"],
+	["600 S, Richmond", 41.910628, -111.814618, 41.910546, -111.809538, -200, 0, "E/W"],
+	["State St, Richmond", 41.922593, -111.80868, 41.912882, -111.808985, 0, -470, "E/W"],
+	["State St, Richmond", 41.912882, -111.808985, 41.910533, -111.809547, -470, -600, "E/W"],
 
 # SMITHFIELD
 	["100 N, Smithfield", 41.838728, -111.843833, 41.838533, -111.826995, -400, 200, "E/W"],
@@ -104,9 +115,9 @@ ROAD_LIST = [
 	["600 N", 41.742926, -111.834659, 41.742597, -111.81672, 0, 700, "E/W"],
 	["500 N", 41.741159, -111.849442, 41.740642, -111.816765, -600, 700, "E/W"],
 	["400 N", 41.739251, -111.849529, 41.739252, -111.847549, -600, -500, "E/W"],
-	["400 N", 41.739252, -111.847549, 41.738754, -111.816803, -500, 600, "E/W"],
-	["US-89", 41.738754, -111.816803, 41.738602, -111.814958, 600, 675, "E/W"],
-	["US-89", 41.738602, -111.814958, 41.740087, -111.810646, 675, 910, "E/W"],
+	["400 N", 41.739252, -111.847549, 41.738754, -111.816803, -500, 700, "E/W"],
+	["US-89", 41.738754, -111.816803, 41.738602, -111.814958, 700, 775, "E/W"],
+	["US-89", 41.738602, -111.814958, 41.740087, -111.810646, 775, 910, "E/W"],
 	["US-89", 41.740087, -111.810646, 41.740963, -111.807201, 910, 1075, "E/W"],
 	["US-89", 41.740963, -111.807201, 41.742528, -111.804282, 1075, 1200, "E/W"],
 	["US-89", 41.742528, -111.804282, 41.743495, -111.802072, 1200, 1290, "E/W"],
@@ -116,15 +127,28 @@ ROAD_LIST = [
 	["200 N", 41.736082, -111.888454, 41.735468, -111.8497, -2163, -600, "E/W"],
 	["200 N", 41.735468, -111.8497, 41.735434, -111.847748, -600, -500, "E/W"],
 	["200 N", 41.735434, -111.847748, 41.735031, -111.824573, -500, 400, "E/W"],
+	["Center Street", 41.73162, -111.849766, 41.731585, -111.847836, -600, -500, "E/W"],
+	["Center Street", 41.731585, -111.847836, 41.731064, -111.814417, -500, 800, "E/W"],
+	["Center Street", 41.731064, -111.814417, 41.729886, -111.810752, 800, 920, "E/W"],
+	["Mountain Rd", 41.729886, -111.810752, 41.72994, -111.811323, 920, 935, "E/W"],
+	["Mountain Rd", 41.72994, -111.811323, 41.729829, -111.80849, 935, 1000, "E/W"],
+	["Mountain Rd", 41.729829, -111.80849, 41.730991, -111.806168, 1000, 1080, "E/W"],
+	["Mountain Rd", 41.730991, -111.806168, 41.731768, -111.806103, 1080, 1130, "E/W"],
+	["Mountain Rd", 41.731768, -111.806103, 41.73193, -111.804277, 1130, 1170, "E/W"],
+	["Mountain Rd", 41.73193, -111.804277, 41.731929, -111.8014, 1170, 1300, "E/W"],
+	["Mountain Rd", 41.731929, -111.8014, 41.73194, -111.799587, 1300, 1400, "E/W"],
 	["200 S", 41.728088, -111.859888, 41.727974, -111.849883, -1000, -600, "E/W"],
 	["200 S", 41.727792, -111.849876, 41.727775, -111.847975, -600, -500, "E/W"],
 	["200 S", 41.727775, -111.847975, 41.727665, -111.842858, -500, -300, "E/W"],
 	["200 S", 41.727796, -111.837703, 41.727471, -111.820439, -100, 573, "E/W"],
-	["400 S", 41.723951, -111.832656, 41.724259, -111.852501, 100, -667, "E/W"],
+	["300 S", 41.726159, -111.850518, 41.725725, -111.82237, -600, 500, "E/W"],
+	["400 S", 41.724259, -111.852501, 41.723951, -111.832656, -667, 100, "E/W"],
 	["600 S", 41.720694, -111.859951, 41.720569, -111.851712, -1000, -640, "E/W"],
 	["600 S", 41.720532, -111.843073, 41.720531, -111.839563, -300, -163, "E/W"],
 	["600 S", 41.720531, -111.839563, 41.721173, -111.835263, -163, 0, "E/W"],
 	["Three Pointe Ave", 41.723453, -111.853043, 41.723627, -111.860068, -700, -1000, "E/W"],
+	["700 S", 41.719283, -111.835316, 41.719263, -111.833424, 0, 80, "E/W"],
+	["700 S", 41.719263, -111.833424, 41.719251, -111.831408, 80, 100, "E/W"],
 	["1000 S", 41.713377, -111.860212, 41.713339, -111.857471, -1000, -900, "E/W"],
 	["1000 S", 41.713339, -111.857471, 41.713268, -111.852853, -900, -800, "E/W"],
 	["1000 S", 41.713268, -111.852853, 41.713219, -111.848539, -800, -580, "E/W"],
@@ -163,6 +187,23 @@ ROAD_LIST = [
 	["Talon Dr", 41.707644, -111.84128, 41.707151, -111.841135, -1305, -1310, "N/S"],
 	["Talon Dr", 41.707151, -111.841135, 41.702824, -111.841219, -1310, -1700, "N/S"],
 	["Hyclone Dr", 41.703754, -111.858334, 41.701009, -111.854903, -1600, -1750, "N/S"],
+	["Heritage Dr", 41.691189, -111.867388, 41.690665, -111.866327, -2290, -2310, "N/S"],
+	["Heritage Dr", 41.690665, -111.866327, 41.689758, -111.866145, -2310, -2365, "N/S"],
+	["Heritage Dr", 41.689758, -111.866145, 41.689025, -111.866842, -2365, -2470, "N/S"],
+	["Nibley Park Ave", 41.689498, -111.866363, 41.689387, -111.86568, -1400, -1350, "E/W"],
+	["Nibley Park Ave", 41.689387, -111.86568, 41.689465, -111.864602, -1350, -1275, "E/W"],
+	["Nibley Park Ave", 41.689465, -111.864602, 41.690263, -111.862707, -1275, -1212, "E/W"],
+	["Nibley Park Ave", 41.690223, -111.861683, 41.690263, -111.862707, -1212, -1180, "E/W"],
+	["Nibley Park Ave", 41.690263, -111.862707, 41.688689, -111.859103, -1180, -1100, "E/W"],
+	["Nibley Park Ave", 41.688689, -111.859103, 41.68852, -111.856847, -1000, -985, "E/W"],
+	["Nibley Park Ave", 41.68852, -111.856847, 41.688809, -111.855701, -985, -940, "E/W"],
+	["Nibley Park Ave", 41.688809, -111.855701, 41.688792, -111.854555, -940, -900, "E/W"],
+	["Nibley Park Ave", 41.688792, -111.854555, 41.688203, -111.853142, -900, -830, "E/W"],
+	["Nibley Park Ave", 41.688203, -111.853142, 41.688142, -111.852416, -830, -800, "E/W"],
+	["Canyon Rd", 41.735007, -111.822085, 41.736018, -111.820723, 500, 550, "E/W"],
+	["Canyon Rd", 41.736018, -111.820723, 41.73667, -111.819269, 550, 600, "E/W"],
+	["Canyon Rd", 41.73667, -111.819269, 41.737407, -111.814663, 600, 730, "E/W"],
+	["Canyon Rd", 41.737407, -111.814663, 41.738487, -111.81098, 730, 970, "E/W"],
 
 # LOGAN, NORTH LOGAN NORTH/SOUTH STREETS
 	["1280 W", 41.703404, -111.866679, 41.700096, -111.866677, -1610, -1800, "N/S"],
@@ -172,6 +213,8 @@ ROAD_LIST = [
 	["800 W", 41.713266, -111.852852, 41.705659, -111.853134, -1000, -1580, "N/S"],
 	["800 W", 41.705659, -111.853134, 41.704244, -111.852724, -1580, -1640, "N/S"],
 	["800 W", 41.704244, -111.852724, 41.703432, -111.851589, -1640, -1700, "N/S"],
+	["800 W", 41.701009, -111.854903, 41.698986, -111.852507, -1750, -1850, "N/S"],
+	["800 W", 41.698986, -111.852507, 41.689637, -111.8524, -1850, -2375, "N/S"],
 	["600 W", 41.778019, -111.84879, 41.726716, -111.849947, 2500, -267, "N/S"],
 	["600 W", 41.726716, -111.849947, 41.723462, -111.853078, -267, -430, "N/S"],
 	["400 W", 41.766939, -111.843721, 41.752393, -111.844191, 1898, 1105, "N/S"],
@@ -208,6 +251,8 @@ ROAD_LIST = [
 	["400 E", 41.753356, -111.824142, 41.749962, -111.824289, 1200, 1000, "N/S"],
 	["400 E", 41.749943, -111.823997, 41.748429, -111.824077, 1000, 900, "N/S"],
 	["400 E", 41.748429, -111.824077, 41.734591, -111.824578, 900, 175, "N/S"],
+	["Country Road", 41.725748, -111.825913, 41.724035, -111.825473, -300, -380, "N/S"],
+	["500 E", 41.734985, -111.822066, 41.729326, -111.822244, 200, -100, "N/S"],
 	["600 E", 41.777684, -111.818463, 41.734938, -111.819303, 2400, 200, "N/S"],
 	["700 E", 41.744558, -111.815825, 41.743783, -111.816704, 700, 661, "N/S"],
 	["700 E", 41.743783, -111.816704, 41.739249, -111.8168, 661, 428, "N/S"],
@@ -222,6 +267,17 @@ ROAD_LIST = [
 
 # Technically in Logan but between Providence (200 W) and Millville (Main)
 	["400 E", 41.695996, -111.823229, 41.694797, -111.823272, -2020, -2100, "N/S"],
+
+# RIVER HEIGHTS
+	["400 E, River Heights", 41.724035, -111.825473, 41.723138, -111.825745, -380, -450, "N/S"],
+	["400 E, River Heights", 41.723138, -111.825745, 41.719501, -111.825818, -450, -700, "N/S"],
+	["500 E, River Heights", 41.724708, -111.822374, 41.721364, -111.822385, -297, -600, "N/S"],
+	["500 E, River Heights", 41.721364, -111.822385, 41.719432, -111.822477, -600, -700, "N/S"],
+	["400 S, River Heights", 41.72364, -111.825575, 41.723571, -111.82238, 400, 500, "E/W"],
+	["400 S, River Heights", 41.723571, -111.82238, 41.723525, -111.819945, 500, 600, "E/W"],
+	["700 S, River Heights", 41.719251, -111.831408, 41.719533, -111.829567, 100, 280, "E/W"],
+	["700 S, River Heights", 41.719533, -111.829567, 41.719435, -111.822476, 280, 500, "E/W"],
+	["700 S, River Heights", 41.719435, -111.822476, 41.719381, -111.820064, 500, 600, "E/W"],
 
 # PROVIDENCE
 	["Gateway Dr, Providence", 41.716938, -111.830021, 41.714975, -111.830044, 435, 358, "N/S"],
@@ -252,6 +308,15 @@ ROAD_LIST = [
 
 # NIBLEY
 	["Mill Rd, Nibley", 41.67668, -111.833360, 41.677371, -111.83035, 0, 200, "E/W"],
+	["2600 S, Nibley", 41.685481, -111.881345, 41.6855, -111.862045, -2000, -1200, "E/W"],
+	["2600 S, Nibley", 41.6855, -111.862045, 41.685494, -111.833853, -1200, 0, "E/W"],
+	["3200 S, Nibley", 41.67528, -111.883221, 41.674651, -111.833392, -2100, 0, "E/W"],
+	["1000 W, Nibley", 41.690101, -111.857337, 41.680672, -111.857166, -2350, -2860, "N/S"],
+	["1000 W, Nibley", 41.680672, -111.857166, 41.679403, -111.857879, -2860, -2934, "N/S"],
+	["1000 W, Nibley", 41.679403, -111.857879, 41.677159, -111.857985, -2934, -3080, "N/S"],
+	["1000 W, Nibley", 41.677159, -111.857985, 41.67657, -111.857667, -3080, -3120, "N/S"],
+	["1000 W, Nibley", 41.67657, -111.857667, 41.674983, -111.857667, -3120, -3200, "N/S"],
+	["800 W, Nibley", 41.689637, -111.8524, 41.674921, -111.85223, -2375, -3200, "N/S"],
 
 # HYRUM
 	["Main Street, Hyrum", 41.634284, -111.866372, 41.633643, -111.835708, -400, 700, "E/W"],
@@ -374,6 +439,35 @@ ROUTE_LIST = {
 
 ######################################################################################
 
+ROUTE_MAP = {
+	"Route  1" : "#1",
+	"Route  2" : "#2",
+	"Route 3" : "#3",
+	"Route  5" : "#5",
+	"Route  6" : "#6",
+	"Route  7" : "#7",
+	"Route  8" : "#8",
+	"Route  9" : "#9",
+	"Route 10" : "#10",
+	"Route 11" : "#11",
+	"Route 12" : "#12",
+	"Route 13" : "#13",
+	"Route 14" : "#14",
+	"Route 15" : "#15",
+	"Route 16 AM" : "#16",
+	"Route 16 PM" : "#16",
+	"Blue Loop 1" : "BLUE",
+	"Blue Loop 2" : "BLUE",
+	"Blue Loop Peak 1" : "BLUE",
+	"Blue Loop Peak 2" : "BLUE",
+	"Green Loop 1" : "GREEN",
+	"Green Loop 2" : "GREEN",
+	"Green Loop Peak 1" : "GREEN",
+	"Green Loop Peak 2" : "GREEN",
+}
+
+######################################################################################
+
 DATA_DROP = [
 	["ORANGE", "2/25/2020", "10:59:00 AM", 41.755532, -111.813898],
 	["ORANGE", "2/25/2020", "10:59:30 AM", 41.757241, -111.813807],
@@ -409,6 +503,13 @@ DATA_DROP = [
 	["ORANGE", "2/25/2020", "11:14:30 AM", 41.762096, -111.818955],
 	["ORANGE", "2/25/2020", "11:15:00 AM", 41.761976, -111.820715],
 ]
+
+######################################################################################
+
+# BUS_LOC is indexed by bus ID
+# BUS_LOC[busId] is a list, where [0] is time and [1, 2, 3] are GPS latitude, longitude and heading
+
+BUS_LOC = {};
 
 ######################################################################################
 
@@ -581,38 +682,153 @@ def get_direction(d):
 	d = round(d / 45) * 45
 	return the_dict[d]
 
-def pull():
-	with open('key.txt', 'r') as f:
-		key = f.read()
-	os.system("curl -o cvtddata.txt http://cvtd.info:8080/CVTDfeed/V200/XML/_System.php?key={}".format(key))
+def print_print_list(print_list, count):
+	for info in print_list:
+		fmt = "{: <" + str(2+max([len(print_list[key][0]) for key in print_list.keys()])) + "}"
+		fmt = fmt.format(print_list[info][0])
+		for i in range(count):
+			try:
+				fmt = fmt + "{}: {: <" + str(2+max([len(print_list[key][i+1][1]) for key in print_list])) + "}{: <10}{: <3}| "
+				#print(max([print_list[key][i][0] for key in print_list]))
+				fmt = fmt.format(print_list[info][i+1][0], print_list[info][i+1][1], str(print_list[info][i+1][2]) + " feet", print_list[info][i+1][3])
+			except IndexError:
+				pass
+		print(fmt)
+
+def add_to_print_list(print_list, bnum, ix):
+	try:
+		t, route, lat, lon, direction = BUS_LOC[bnum][ix]
+	except IndexError:
+		return
+
+	# Determine route
+	valid_streets = None
+	try:
+		rname = ROUTE_MAP[route]
+		if rname in ROUTE_LIST:
+			route_fixed = eval(routefix(rname))
+			valid_streets = set(a[0] for a in route_fixed[0])
+	except KeyError:
+		print('Warning: Route "{}" could not be found in route map'.format(route))
+	except IndexError:
+		return
+
+	# Compute address
+	addr, error = compute_addr(lat, lon, valid_streets)
+	if valid_streets is not None and error > 250:
+		addr_off_route, error_off_route = compute_addr(lat, lon, None)
+		if error_off_route < 200:
+			addr = "!" + addr_off_route 
+			error = error_off_route
+	error = round(error)
+
+	# Determine if direction is actual or if it should be X
+	try:
+		lat_to_lat_diff = abs((BUS_LOC[bnum][ix - 1][2] - lat))*70*5280
+		lon_to_lon_diff = abs((BUS_LOC[bnum][ix - 1][3] - lon))*70*5280
+		pos_to_pos_diff = math.sqrt(lat_to_lat_diff ** 2 + lon_to_lon_diff ** 2)
+		if (pos_to_pos_diff < 40):
+			direction = 'X'
+		else:
+			direction = get_direction(direction)
+	except IndexError:
+		direction = get_direction(direction)
+
+	# Add to list to print later
+	try:
+		print_list[bnum].append([t, addr, error, direction])
+	except KeyError:
+		print_list[bnum] = [route]
+		print_list[bnum].append([t, addr, error, direction])
+
+def pull_data(key):
+	NUM_ELEMENTS = 5
+	new_elements = []
+
+	os.system("curl -o cvtddata.txt http://cvtd.info:8080/CVTDfeed/V200/XML/_System.php?key={} -s".format(key))
 	tree = ET.parse('cvtddata.txt')
 	root = tree.getroot()
 	for bus in root:
-		try:
-			route = bus[5].text
-			lat = float(bus[8][0][0].text)
-			lon = float(bus[8][0][1].text)
-			direction = int(bus[8][0][2].text)
-			if lat == 0.0 and lon == 0.0:
+		for i in range(NUM_ELEMENTS - 1, 0, -1):
+			try:
+				bnum = bus[3].text
+				route = bus[5].text
+				t = bus[8][i].text.strip().split()[1].split('.')[0]
+				lat = float(bus[8][i][0].text)
+				lon = float(bus[8][i][1].text)
+				direction = int(bus[8][i][2].text)
+				if lat == 0.0 and lon == 0.0:
+					continue
+			except IndexError:
 				continue
-			addr, error = compute_addr(lat, lon, None)
-			error = round(error)
-			pos_to_pos_diff = abs((float(bus[8][1][0].text) - lat))*70*5280
-			if (direction == 0) and (pos_to_pos_diff < 40):
-				direction = 'STOPPED'
-			else:
-				direction = get_direction(direction)
-			print("{: <20}{: <40}{: <10}{}".format(route, addr, str(error) + " feet", direction))
-		except IndexError:
-			pass
+
+			entry_exists = False
+			try:
+				entry_exists = t in [e[0] for e in BUS_LOC[bnum]]
+			except KeyError:
+				entry_exists = False
+				BUS_LOC[bnum] = []
+
+			if not entry_exists:
+				BUS_LOC[bnum].append((t, route, lat, lon, direction))
+				new_elements.append((bnum, len(BUS_LOC[bnum]) - 1))
+	return new_elements
+
+def pull(count, key):
+	if not 1 <= count <= 5:
+		print("Error [pull]: Count must be between 1 and 5")
+		return
+
+	pull_data(key)
+
+	print_list = {}
+	for i in range(count):
+		for bnum in BUS_LOC:
+			add_to_print_list(print_list, bnum, -1 - i)
+
+	print_print_list(print_list, count)
+
+######################################################################################
+
+g_fastPullRunning = False
+fastPullDelay = 0.5
+
+def fastpull_main(max_counter, key):
+	counter = max_counter
+	while g_fastPullRunning == True:
+		if counter == max_counter:
+			new_elements = pull_data(key)
+			if len(new_elements) > 0:
+				print('')
+				print_list = {}
+				for bnum, ix in new_elements:
+					add_to_print_list(print_list, bnum, ix)
+				print_print_list(print_list, 5)
+				print("\n>>> ", end="")
+
+				counter = 0
+		counter = counter + fastPullDelay
+		time.sleep(fastPullDelay)
+	
+
+######################################################################################
 
 def main():
+	global g_fastPullRunning
+
+	with open('key.txt', 'r') as f:
+		key = f.read()
+	fastpull_thread = None
+
 	while True:
 		text_in = input(">>> ")
 		text_spl = text_in.strip().split()
 		if len(text_in) == 0:
 			continue
 		if text_in.lower() in ['exit', 'e', 'exit()', 'quit', 'q']:
+			if g_fastPullRunning == True:
+				g_fastPullRunning = False
+				fastpull_thread.join()
 			break
 		elif text_in.lower() in ['help', 'usage', 'h', 'u']:
 			print("{: <24}Bring up this help page".format("help"))
@@ -621,6 +837,7 @@ def main():
 			print("{: <24}Converts a route from latitude and longitude to street and proj ratio".format("routefix [route]"))
 			print("{: <24}Prints address and route completion for data drop for given route".format("datadrop [route]"))
 			print("{: <24}Prints percent complete for given point of given route".format("ppt [route] [pointix]"))
+			print("{: <24}Pulls current bus locations and prints most recent # locations".format("pull [# points]"))
 		elif text_spl[0].lower() == 'addr':
 			try:
 				addr, error = compute_addr(float(text_spl[1]), float(text_spl[2]), None)
@@ -660,13 +877,34 @@ def main():
 				segment_ix = int(text_spl[2])
 				print("{}%".format(100 * compute_route_completion(route[0], route[1][segment_ix][0], route[1][segment_ix][1])))
 			except IndexError:
-				print("Error [ppt]: Please provide the name of the route and the index of the point")
+				print("Error [spt]: Please provide the name of the route and the index of the point")
 			except KeyError:
-				print("Error [ppt]: Route {} does not exist".format(text_spl[1]))
+				print("Error [spt]: Route {} does not exist".format(text_spl[1]))
 			except ValueError:
-				print("Error [ppt]: Point {} could not be converted to an integer".format(text_spl[2]))
+				print("Error [spt]: Point {} could not be converted to an integer".format(text_spl[2]))
 		elif text_spl[0].lower() == 'pull':
-			pull()
+			try:
+				pull(int(text_spl[1]), key)
+			except ValueError:
+				print("Error [pull]: Number of points {} could not be converted to an integer".format(text_spl[1]))
+			except IndexError:
+				pull(1, key)
+		elif text_spl[0].lower() == 'fastpull':
+			if g_fastPullRunning:
+				g_fastPullRunning = False
+				fastpull_thread.join()
+				fastpull_thread = None
+			else:
+				g_fastPullRunning = True
+				try:
+					fastpull_thread = threading.Thread(target=fastpull_main, args=(float(text_spl[1]), key))
+					fastpull_thread.start()
+				except ValueError:
+					print("Error [fastpull]: Pull delay {} could not be converted to an float".format(text_spl[1]))
+					g_fastPullRunning = False
+				except IndexError:
+					fastpull_thread = threading.Thread(target=fastpull_main, args=(5.0, key))
+					fastpull_thread.start()
 
 		print("")
 
