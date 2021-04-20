@@ -18,3 +18,4 @@ class CvtdBusPosition:
 		self.lon = lon
 		self.direction = direction
 		
+

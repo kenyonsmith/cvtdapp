@@ -32,3 +32,4 @@ class Direction(enum.Enum):
 def get_direction(d):
 	d = round(d / 45) * 45
 	return HEADING_DICT[d]
+

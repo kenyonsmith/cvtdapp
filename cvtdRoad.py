@@ -106,3 +106,4 @@ class CvtdRoad:
 			if posterm == None or point.addr > posterm:
 				posterm = point.addr
 		return [negterm, posterm]
+
