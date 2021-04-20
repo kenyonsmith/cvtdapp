@@ -12,3 +12,4 @@ class CvtdRoadPoint:
 	def __init__(self, node, addr):
 		self.node = node
 		self.addr = addr
+

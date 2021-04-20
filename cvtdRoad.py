@@ -170,3 +170,4 @@ class CvtdRoad:
     if len(self.points) < 2:
       return None
     return self.points[-1].addr > self.points[0].addr
+

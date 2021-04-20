@@ -320,4 +320,4 @@ class CvtdMap:
         if not found:
           self.nodeList.append(fromNodeList[point.node])
       self.add_street(street)
-    
+

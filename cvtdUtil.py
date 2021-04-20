@@ -176,3 +176,4 @@ class CvtdUtil:
     
     # If result was set, return the value. Else return None
     return result
+
