@@ -82,12 +82,19 @@ class Importer:
     nodeOffset = len(self.mainMap.nodeList)
 
     whichWay = CvtdUtil.input_int("Adding a new road. Start with which way? ", 1, len(ways)) - 1
-    if whichWay:
-      newRoad.name = ways[whichWay].name
+    if type(whichWay) is int:
+      newName = input(f'Enter a name for this road (leave blank for "{ways[whichWay].name}"): ')
+      if newName:
+        newRoad.name = newName
+      else:
+        newRoad.name = ways[whichWay].name
       newRoad.dir = input(f"Enter a direction for {newRoad.name} ('N/S', 'E/W', or other'): ")
       minValue = None
       maxValue = None
       lastValue = None
+
+      # Merge check, only once, at the end. Reset to True if they accept the merge
+      mergeCheck = True
 
       # For each point in this way
       pointList = ways[whichWay].points
@@ -152,17 +159,36 @@ class Importer:
             elif addr in ["return", 'r']:
               returnPointList.append(point)
             else:
-              newRoad.points.append(CvtdRoadPoint(point.node, addr))
+              newRoad.insert(CvtdRoadPoint(point.node, addr))
           else:
             return
         
-        pointList = returnPointList
-      
-      # They successfully added all the points
+        if len(returnPointList) > 0:
+          pointList = returnPointList
+        elif mergeCheck:
+          mergeCheck = False
+          print("\nYou've defined the following road:")
+          newRoad.describe(self.nodeDict)
+          print('')
 
-      # Here, you should find out if they want to combine this way with any other ways
-      print("\nYou've defined the following road:")
-      newRoad.describe(self.nodeDict)
+          # They successfully added all the points. See if they want to merge with another road
+          possibleMerges = [way for way in self.roadList if way.extendable(ways[whichWay])]
+
+          if len(possibleMerges) > 0:
+            print(f"There are {len(possibleMerges)} ways that you could merge into this road. ")
+            for ix, way in enumerate(possibleMerges):
+              print(f"[{ix+1}]: {way.name} has {len(way.points)} nodes")
+              print(" " + ", ".join([f"({self.nodeDict[p.node].lat}, {self.nodeDict[p.node].lon})" for p in way.points]))
+            
+            mergeWay = CvtdUtil.input_int(f"Merge another road into this road? (1-{len(possibleMerges)}) or (n)o: ", 1, len(possibleMerges), validAnswers=['n', 'no'])
+            if type(mergeWay) is int:
+              mergeWay = mergeWay - 1
+              pointList = possibleMerges[mergeWay].points
+              mergeCheck = True
+        else:
+          # They were offered a merge check but they rejected it
+          pointList = []
+
       confirm = input("Add this new road to your map? (y/n): ") == 'y'
       if confirm:
         self.mainMap.add_street_with_nodes(newRoad, self.nodeDict)

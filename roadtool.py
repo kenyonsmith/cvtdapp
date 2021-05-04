@@ -451,6 +451,20 @@ def new_route(map):
         more_points = False
 
 ####
+# new_node allows the user to add a node
+####
+def new_node(map):
+  valid, lat, lon = parse_gps()
+  dlist = map.generate_dlist(lat, lon)
+  dlist_sorted = sorted(dlist)
+  dlist_ix = dlist.index(dlist_sorted[0])
+  node = self.nodeList[dlist_ix]
+  c = input(f"The closest node is at ({node.lat}, {node.lon}), about {CvtdUtil.coord_to_ft(dlist_sorted[0])} ft away. Continue?") == 'y'
+  if c:
+    self.nodeList.append(CvtdNode(lat, lon))
+    print(f"Node added successfully. There are now {len(self.nodeList)} nodes.")
+
+####
 # search_nodes displays nodes close to a given lat & lon location
 ####
 def search_nodes(map):
