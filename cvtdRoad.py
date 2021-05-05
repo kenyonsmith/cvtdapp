@@ -147,8 +147,15 @@ class CvtdRoad:
         startAddr = self.points[point_ix].addr
         refAddr = self.points[point_ix+1].addr
 
-      addrPerLat = (refAddr - startAddr) / (refNode.lat - startNode.lat)
-      addrPerLon = (refAddr - startAddr) / (refNode.lon - startNode.lon)
+      try:
+        addrPerLat = (refAddr - startAddr) / (refNode.lat - startNode.lat)
+      except ZeroDivisionError:
+        addrPerLat = 0
+      try:
+        addrPerLon = (refAddr - startAddr) / (refNode.lon - startNode.lon)
+      except ZeroDivisionError:
+        addrPerLon = 0
+  
       latAddrTot = addrPerLat * (node.lat-startNode.lat)
       lonAddrTot = addrPerLon * (node.lon-startNode.lon)
       latDiff = refNode.lat - startNode.lat
@@ -171,3 +178,45 @@ class CvtdRoad:
       return None
     return self.points[-1].addr > self.points[0].addr
 
+  ####
+  # insert tries to insert a point into the appropriate location based on address
+  #
+  # p is the point to insert
+  ####
+  def insert(self, p):
+    import pdb; pdb.set_trace()
+    for point_ix, point in enumerate(self.points[:-1]):
+      nextPoint = self.points[point_ix + 1]
+      # If the address is between nextPoint.addr and point.addr
+      if (p.addr - nextPoint.addr) * (point.addr - p.addr) > 0:
+        self.points.insert(point_ix, p)
+        return
+    self.points.append(p)
+
+  ####
+  # extendable checks to see if another road can be tacked onto this one, by comparing lat and lon of endpoints
+  #
+  # otherRoad is the other road to attempt to tack on
+  #
+  # returns True if extendable, else False
+  ####
+  def extendable(self, otherRoad):
+    # If one road is fully contained within the other, the answer is no
+    if all([x in [p.node for p in otherRoad.points] for x in [self.points[0].node, self.points[-1].node]]):
+      return False
+    if all([x in [p.node for p in self.points] for x in [otherRoad.points[0].node, otherRoad.points[-1].node]]):
+      return False
+
+    if self.points[0].node == otherRoad.points[0].node:
+      # self.points = list(reversed(otherRoad.points[1:])) + self.points
+      return True
+    elif self.points[0].node == otherRoad.points[-1].node:
+      # self.points = otherRoad.points[:-1] + self.points
+      return True
+    elif self.points[-1].node == otherRoad.points[0].node:
+      # self.points = self.points + otherRoad.points[1:]
+      return True
+    elif self.points[-1].node == otherRoad.points[-1].node:
+      # self.points = self.points + list(reversed(otherRoad.points[:-1]))
+      return True
+    return False
