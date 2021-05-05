@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 ####
 # A class containing information about buses and their locations
 #
-# pos -> A dictionary, where key is bus identifier and value is a list of CvtdBusPosition's
+# pos -> A dictionary, where key is 4-digit bus number and value is a list of CvtdBusPosition's, sorted by timestamp
 ####
 class CvtdBusLocator:
 	def __init__(self):
@@ -12,7 +12,7 @@ class CvtdBusLocator:
 	####
 	# insert inserts a position into the locator such that CvtdBusPosition arrays are always sorted by timestamp
 	#
-	# key is the key of the bus into the pos dictionary
+	# key is the key of the bus into the pos dictionary, the 4-digit bus number
 	# position is the CvtdBusPosition object to be inserted
 	####
 	def insert(self, key, position):
@@ -31,10 +31,21 @@ class CvtdBusLocator:
 					# We went back too far, go forward one spot
 					self.pos[key].insert(ix+1, position)
 					break
+				elif position.timestamp == self.pos[key][ix].timestamp:
+					# We found an exact match, don't bother adding
+					return
 				ix -= 1
 			if ix == -1:
 				self.pos[key].insert(0, position)
 	
+	####
+	# find_next_after returns the CvtdBusPosition after a given timestamp
+	#
+	# key is the key of the bus into the pos dictionary
+	# timestamp is the timestamp to find next position after
+	#
+	# return is the CvtdBusPosition, or None if none exists
+	####
 	def find_next_after(self, key, timestamp):
 		ix = 0
 		while ix < len(self.pos[key]):
@@ -42,27 +53,35 @@ class CvtdBusLocator:
 				return self.pos[key][ix]
 			ix += 1
 	
+	####
+	# find_next_before returns the CvtdBusPosition before a given timestamp
+	#
+	# key is the key of the bus into the pos dictionary
+	# timestamp is the timestamp to find position before
+	#
+	# return is the CvtdBusPosition, or None if none exists
+	####
 	def find_next_before(self, key, timestamp):
 		ix = len(self.pos[key])-1
 		while ix >= 0:
 			if self.pos[key][ix].timestamp < timestamp:
 				return self.pos[key][ix]
 			ix -= 1
-	
-	def parse_cvtd_feed(self, filename):
-		tree = ET.parse(filename)
-		root = tree.getroot()
-		for bus in root:
-			for i in range(NUM_ELEMENTS - 1, 0, -1):
-				try:
-					bnum = bus[3].text
-					route = bus[5].text
-					t = bus[8][i].text.strip().split()[1].split('.')[0]
-					lat = float(bus[8][i][0].text)
-					lon = float(bus[8][i][1].text)
-					direction = int(bus[8][i][2].text)
-					if lat == 0.0 and lon == 0.0:
-						continue
-				except IndexError:
-					continue
 
+	####
+	# find searches for a bus position exactly matching the given timestamp
+	#
+	# key is the key of the bus into the pos dictionary
+	# timestamp is the timestamp to find position for
+	#
+	# return is the CvtdBusPosition, or None if none exists
+	####
+	def find(self, key, timestamp):
+		try:
+			ix = len(self.pos[key])-1
+			while ix >= 0:
+				if self.pos[key][ix].timestamp == timestamp:
+					return self.pos[key][ix]
+				ix -= 1
+		except KeyError:
+			return None

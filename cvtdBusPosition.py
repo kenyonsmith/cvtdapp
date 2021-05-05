@@ -4,6 +4,7 @@
 # timestamp -> datetime.datetime.Datetime associated with this ping
 # lat -> latitude of the ping
 # lon -> longitude of the ping
+# direction -> direction (as integer from 0 to 360) indicated by XML pull, or calculated
 ####
 class CvtdBusPosition:
 	def __init__(self):

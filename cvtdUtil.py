@@ -126,18 +126,6 @@ class CvtdUtil:
     return x, y
 
   ####
-  # get_direction finds the closest direction from "N" through "SW" to a heading in degrees
-  #
-  # d is the heading in degrees
-  #
-  # return is the string representatino of the direction
-  ####
-  def get_direction(d):
-    the_dict = {0: "N", 45: "NE", 90: "E", 135: "SE", 180: "S", 225: "SW", 270: "W", 315: "NW", 360: "N"}
-    d = round(d / 45) * 45
-    return the_dict[d]
-
-  ####
   # input_int tries to get a valid integer from the user
   #
   # prompt is the parameter to input()

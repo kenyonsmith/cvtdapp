@@ -119,7 +119,7 @@ class CvtdMap:
     else:
       addrRepr = "N/A"
 
-    return ix, addrRepr, CvtdUtil.coord_to_ft(error)
+    return ix, addrRepr, error
 
   ####
   # get_node_usage returns a list of road points using a given node index
@@ -320,4 +320,30 @@ class CvtdMap:
         if not found:
           self.nodeList.append(fromNodeList[point.node])
       self.add_street(street)
+
+  ####
+  # bnum_to_route gets the route that has this bus number
+  #
+  # bnum is the bus number to look up
+  #
+  # return is a CvtdRoute
+  ####
+  def bnum_to_route(self, bnum):
+    for route in self.routeList:
+      if bnum in [bus.busNumber for bus in route.buses]:
+        return route
+
+  ####
+  # bnum_to_street_list gets a set of indices into self.roadList that this route uses
+  #
+  # bnum is the bus number to look up
+  #
+  # return is a set of integers that index into self.roadList, or {} if bus number not found
+  ####
+  def bnum_to_street_list(self, bnum):
+    route = self.bnum_to_route(bnum)
+    try:
+      return route.get_street_list()
+    except AttributeError:
+      return None
 

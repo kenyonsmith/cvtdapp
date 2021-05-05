@@ -87,15 +87,11 @@ class CvtdRoute:
       segRoad = roadList[segment.roadIx]
       s = f" - {segRoad.name} from {CvtdUtil.addr_dir(segment.beginAddr, segRoad.dir)} to {CvtdUtil.addr_dir(segment.endAddr, segRoad.dir)}"
       print(s)
-
-####
-# print_segments prints out each segment in the route
-#
-# roadList is the RoadList referred to by the route's segments
-####
-def print_segments(self, roadList):
-	for segment in this_route.segments:
-		segRoad = roadList[segment.roadIx]
-		s = f" - {segRoad.name} from {CvtdUtil.addr_dir(segment.beginAddr, segRoad.dir)} to {CvtdUtil.addr_dir(segment.endAddr, segRoad.dir)}"
-		print(s)
-
+  
+  ####
+  # get_street_list generates a list of streets used by this route
+  #
+  # return is a list of street indices
+  ####
+  def get_street_list(self):
+    return set(segment.roadIx for segment in self.segments)
