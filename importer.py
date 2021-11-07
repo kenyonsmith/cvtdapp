@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+import os
+import sys
 import xml.etree.ElementTree as ET
 
 from cvtdNode import CvtdNode
@@ -5,60 +8,153 @@ from cvtdRoad import CvtdRoad
 from cvtdRoadPoint import CvtdRoadPoint
 from cvtdMap import CvtdMap
 from cvtdUtil import CvtdUtil
+from gtfsImporter import GtfsImporter
 
 ####
-# Imports an XML file 
+# Application to import an XML file
 #
 # nodeDict is a dictionary, where the key is the XML ID and the value is a CvtdNode
 # roadList is a list of CvtdRoad's, with 'addr' field set to None
 # mainMap is the CvtdMap we will be merging into
+# gtfsLocation is the string pointing to the folder where GTFS data is found
 ####
 class Importer:
   def __init__(self):
     self.roadList = []
     self.nodeDict = {}
     self.mainMap = None
+    self.gtfsLocation = None
 
   ####
   # Shows the options available to the user on the command line
   ####
   def show_help(self):
-    print("\n(1) Search for a road with the following name")
-  
+    print("")
+    print("(1) Search for a road with the following name")
+    print("(2) Select most interesting new road")
+
   ####
-  # Merges roads in a Road List based on beginning/ending node
+  # add_road helps the user to merge a road into the main map
   #
-  # roadList is the list of roads to merge
+  # way is the CvtdRoad to merge into
   ####
-  # def merge_ways(self, roadList):
-  #   mergeFound = True
-  #   lastWix = 0
-  #   while mergeFound:
-  #     mergeFound = False
-  #     for wix, way in enumerate(roadList[lastWix:]):
-  #       for cmpix, cmpway in enumerate(roadList):
-  #         if way is not cmpway:
-  #           if way.points[0].node == cmpway.points[0].node and way.name == cmpway.name:
-  #             way.points = list(reversed(cmpway.points[1:])) + way.points
-  #             mergeFound = True
-  #           elif way.points[0].node == cmpway.points[-1].node and way.name == cmpway.name:
-  #             way.points = cmpway.points[:-1] + way.points
-  #             mergeFound = True
-  #           elif way.points[-1].node == cmpway.points[0].node and way.name == cmpway.name:
-  #             way.points = way.points + cmpway.points[1:]
-  #             mergeFound = True
-  #           elif way.points[-1].node == cmpway.points[-1].node and way.name == cmpway.name:
-  #             way.points = way.points + list(reversed(cmpway.points[:-1]))
-  #             mergeFound = True
-  #         if mergeFound:
-  #           print(f"Merged two instances of {way.name}, list length is {len(roadList)}")
-  #           del roadList[cmpix]
-  #           break
-  #       if mergeFound:
-  #         break
-  #       else:
-  #         lastWix = wix
-  
+  def add_road(self, way):
+    newRoad = CvtdRoad()
+    newNodes = []
+    nodeOffset = len(self.mainMap.nodeList)
+
+    newName = input(f'Enter a name for this road (leave blank for "{way.name}"): ')
+    if newName:
+      newRoad.name = newName
+    else:
+      newRoad.name = way.name
+    newRoad.dir = input(f"Enter a direction for {newRoad.name} ('N/S', 'E/W', or other'): ")
+    minValue = None
+    maxValue = None
+    lastValue = None
+
+    # Merge check, only once, at the end. Reset to True if they accept the merge
+    mergeCheck = True
+
+    # For each point in this way
+    pointList = way.points
+    # Let them come back to some points if desired
+    while len(pointList) > 0:
+      returnPointList = []
+      for point in pointList:
+        # Don't let the same point get added twice
+        if point.node in [p.node for p in newRoad.points]:
+          continue
+        
+        # Store the node in question
+        node = self.nodeDict[point.node]
+
+        # Look for ways in the OSM file that also use this node
+        newIntersections = []
+        for checkWay in self.roadList:
+          if point.node in [checkPoint.node for checkPoint in checkWay.points]:
+            newIntersections.append(checkWay)
+        
+        # Calculate the "best guess" for the address at this point
+        interpolateAddress = newRoad.estimate_addr(node, self.nodeDict)
+        print(f"\nNext point is ({node.lat}, {node.lon}), best guess {interpolateAddress}")
+        if len(newIntersections) > 0:
+          print(f"The following {len(newIntersections)} roads from the OSM file intersect at this node: ")
+          for way in newIntersections:
+            print(" - " + way.name + ': ' + str(way.tags))
+
+        # Determine a max and a min value for this point
+        if len(newRoad.points) == 0:
+          minValue = None
+          maxValue = None
+          neValue = None
+        elif len(newRoad.points) == 1:
+          minValue = None
+          maxValue = None
+          neValue = newRoad.points[0].addr
+        else:
+          point_ix, proj_ratio, error = newRoad.compute_proj_ratio(node.lat, node.lon, self.nodeDict)
+          inc = newRoad.increasing()
+          if (proj_ratio < 0 and inc) or (proj_ratio > 1 and not inc):
+            # Address must be less than the first address
+            minValue = None
+            maxValue = newRoad.points[0].addr - 1
+            neValue = None
+          elif (proj_ratio > 1 and inc) or (proj_ratio < 0 and not inc):
+            # Address must be greater than the final address
+            minValue = newRoad.points[-1].addr + 1
+            maxValue = None
+            neValue = None
+          else:
+            # Address must be between point #point_ix and the following point
+            minValue = newRoad.points[point_ix].addr + 1 if inc else newRoad.points[point_ix + 1].addr - 1
+            maxValue = newRoad.points[point_ix + 1].addr - 1 if inc else newRoad.points[point_ix].addr + 1
+            neValue = None
+          
+        # Now let them choose an address, or 'skip' (ignore this point), or 'return' (come back to this point later)
+        addr = CvtdUtil.input_int("Enter the address for this point, or 'skip' or 'return': ", minValue, maxValue, neValue, ['skip', 'return', 's', 'r'])
+        if addr is not None:
+          if addr in ["skip", 's']:
+            pass
+          elif addr in ["return", 'r']:
+            returnPointList.append(point)
+          else:
+            newRoad.insert(CvtdRoadPoint(point.node, addr))
+            newRoad.describe(self.nodeDict)
+        else:
+          return
+      
+      if len(returnPointList) > 0:
+        pointList = returnPointList
+      elif mergeCheck:
+        mergeCheck = False
+        print("\nYou've defined the following road:")
+        newRoad.describe(self.nodeDict)
+        print('')
+
+        # They successfully added all the points. See if they want to merge with another road
+        possibleMerges = [way for way in self.roadList if newRoad.extendable(way)]
+
+        if len(possibleMerges) > 0:
+          print(f"There are {len(possibleMerges)} ways that you could merge into this road. ")
+          for ix, way in enumerate(possibleMerges):
+            print(f"[{ix+1}]: {way.name} has {len(way.points)} nodes")
+            print(" " + ", ".join([f"({self.nodeDict[p.node].lat}, {self.nodeDict[p.node].lon})" for p in way.points]))
+          
+          mergeWay = CvtdUtil.input_int(f"Merge another road into this road? (1-{len(possibleMerges)}) or (n)o: ", 1, len(possibleMerges), validAnswers=['n', 'no'])
+          if type(mergeWay) is int:
+            mergeWay = mergeWay - 1
+            pointList = possibleMerges[mergeWay].points
+            mergeCheck = True
+      else:
+        # They were offered a merge check but they rejected it
+        pointList = []
+
+    confirm = input("Add this new road to your map? (y/n): ") == 'y'
+    if confirm:
+      self.mainMap.add_street_with_nodes(newRoad, self.nodeDict)
+      print(f"You now have {len(self.mainMap.roadList)} roads.")
+
   ####
   # search_road searches for roads that match the given name, and helps the user to merge them in the main map
   ####
@@ -72,126 +168,40 @@ class Importer:
 
     # Print information about each of the matching ways
     for ix, way in enumerate(ways):
-      print(f"[{ix+1}]: {way.name} has {len(way.points)} nodes")
-      print(" " + ", ".join([f"({self.nodeDict[p.node].lat}, {self.nodeDict[p.node].lon})" for p in way.points]))
+      try:
+        print(f"[{ix+1}]: {way.name} has {len(way.points)} nodes")
+        print(" " + ", ".join([f"({self.nodeDict[p.node].lat}, {self.nodeDict[p.node].lon})" for p in way.points]))
+      except KeyError:
+        print(f"Unknown node")
     
     # Here, compare with what is currently in the file to see if we want to add onto a road, modify a road, or do nothing
     # For the present, we'll just add a new road
-    newRoad = CvtdRoad()
-    newNodes = []
-    nodeOffset = len(self.mainMap.nodeList)
-
-    whichWay = CvtdUtil.input_int("Adding a new road. Start with which way? ", 1, len(ways)) - 1
+    whichWay = CvtdUtil.input_int("Adding a new road. Start with which way? ", 1, len(ways))
     if type(whichWay) is int:
-      newName = input(f'Enter a name for this road (leave blank for "{ways[whichWay].name}"): ')
-      if newName:
-        newRoad.name = newName
+      self.add_road(ways[whichWay - 1])
+  
+  ####
+  # get_gtfs_location queries the user for the GTFS folder until they give up or provide a valid folder
+  ####
+  def get_gtfs_location(self):
+    keepTrying = True
+    while keepTrying:
+      tryLocation = input("Please enter the path to the GTFS folder: ")
+      if os.path.isdir(tryLocation):
+        self.gtfsLocation = tryLocation
+        GtfsImporter.import_google_directory(tryLocation, self.mainMap)
+        keepTrying = False
       else:
-        newRoad.name = ways[whichWay].name
-      newRoad.dir = input(f"Enter a direction for {newRoad.name} ('N/S', 'E/W', or other'): ")
-      minValue = None
-      maxValue = None
-      lastValue = None
-
-      # Merge check, only once, at the end. Reset to True if they accept the merge
-      mergeCheck = True
-
-      # For each point in this way
-      pointList = ways[whichWay].points
-      # Let them come back to some points if desired
-      while len(pointList) > 0:
-        returnPointList = []
-        for point in pointList:
-          # Don't let the same point get added twice
-          if point.node in [p.node for p in newRoad.points]:
-            continue
-          
-          # Store the node in question
-          node = self.nodeDict[point.node]
-
-          # Look for ways in the OSM file that also use this node
-          newIntersections = []
-          for checkWay in self.roadList:
-            if point.node in [checkPoint.node for checkPoint in checkWay.points]:
-              newIntersections.append(checkWay)
-          
-          # Calculate the "best guess" for the address at this point
-          interpolateAddress = newRoad.estimate_addr(node, self.nodeDict)
-          print(f"\nNext point is ({node.lat}, {node.lon}), best guess {interpolateAddress}")
-          if len(newIntersections) > 0:
-            print(f"The following {len(newIntersections)} roads from the OSM file intersect at this node: ")
-            for way in newIntersections:
-              print(" - " + way.name + ': ' + str(way.tags))
-
-          # Determine a max and a min value for this point
-          if len(newRoad.points) == 0:
-            minValue = None
-            maxValue = None
-            neValue = None
-          elif len(newRoad.points) == 1:
-            minValue = None
-            maxValue = None
-            neValue = newRoad.points[0].addr
-          else:
-            point_ix, proj_ratio, error = newRoad.compute_proj_ratio(node.lat, node.lon, self.nodeDict)
-            inc = newRoad.increasing()
-            if (proj_ratio < 0 and inc) or (proj_ratio > 1 and not inc):
-              # Address must be less than the first address
-              minValue = None
-              maxValue = newRoad.points[0].addr - 1
-              neValue = None
-            elif (proj_ratio > 1 and inc) or (proj_ratio < 0 and not inc):
-              # Address must be greater than the final address
-              minValue = newRoad.points[-1].addr + 1
-              maxValue = None
-              neValue = None
-            else:
-              # Address must be between point #point_ix and the following point
-              minValue = newRoad.points[point_ix].addr + 1 if inc else newRoad.points[point_ix + 1].addr - 1
-              maxValue = newRoad.points[point_ix + 1].addr - 1 if inc else newRoad.points[point_ix].addr + 1
-              neValue = None
-            
-          # Now let them choose an address, or 'skip' (ignore this point), or 'return' (come back to this point later)
-          addr = CvtdUtil.input_int("Enter the address for this point, or 'skip' or 'return': ", minValue, maxValue, neValue, ['skip', 'return', 's', 'r'])
-          if addr is not None:
-            if addr in ["skip", 's']:
-              pass
-            elif addr in ["return", 'r']:
-              returnPointList.append(point)
-            else:
-              newRoad.insert(CvtdRoadPoint(point.node, addr))
-          else:
-            return
-        
-        if len(returnPointList) > 0:
-          pointList = returnPointList
-        elif mergeCheck:
-          mergeCheck = False
-          print("\nYou've defined the following road:")
-          newRoad.describe(self.nodeDict)
-          print('')
-
-          # They successfully added all the points. See if they want to merge with another road
-          possibleMerges = [way for way in self.roadList if way.extendable(ways[whichWay])]
-
-          if len(possibleMerges) > 0:
-            print(f"There are {len(possibleMerges)} ways that you could merge into this road. ")
-            for ix, way in enumerate(possibleMerges):
-              print(f"[{ix+1}]: {way.name} has {len(way.points)} nodes")
-              print(" " + ", ".join([f"({self.nodeDict[p.node].lat}, {self.nodeDict[p.node].lon})" for p in way.points]))
-            
-            mergeWay = CvtdUtil.input_int(f"Merge another road into this road? (1-{len(possibleMerges)}) or (n)o: ", 1, len(possibleMerges), validAnswers=['n', 'no'])
-            if type(mergeWay) is int:
-              mergeWay = mergeWay - 1
-              pointList = possibleMerges[mergeWay].points
-              mergeCheck = True
-        else:
-          # They were offered a merge check but they rejected it
-          pointList = []
-
-      confirm = input("Add this new road to your map? (y/n): ") == 'y'
-      if confirm:
-        self.mainMap.add_street_with_nodes(newRoad, self.nodeDict)
+        keepTrying = input("That wasn't a valid folder location. Try again? (y/n) ")
+  
+  ####
+  # add_most_interesting_road searches for the most interesting road to add and helps the user add it
+  ####
+  def add_most_interesting_road(self):
+    self.get_gtfs_location()
+    if self.gtfsLocation is not None:
+      # Now we have access to the routes and we can find streets that the routes are on
+      pass
 
   ####
   # main function as seen by the user
@@ -201,22 +211,37 @@ class Importer:
     while command not in ["quit", "exit", "q", "e"]:
       if command == "1":
         self.search_road()
+      elif command == "2":
+        self.add_most_interesting_road()
       else:
         self.show_help()
       command = input("\n>>> ")
+  
+  ####
+  # Removes references to nodes that do not exist
+  ####
+  def sanitize(self):
+    retry = True
+    while retry:
+      retry = False
+      for road in self.roadList:
+        # for p in road.points:
+        road.points = [p for p in road.points if p.node in self.nodeDict]
+        if len(road.points) == 0:
+          self.roadList.remove(road)
+          retry = True
+          break
 
   ####
-  # Application entry point for importing an XML OSM file
+  # Imports all nodes and ways in a file and adds them to self.nodeDict and self.roadList
   #
   # filename is path of the OSM file
-  # mainMap is the CvtdMap that roads and nodes will be merged into
   ####
-  def import_xml(self, filename, mainMap):
+  def import_xml_file(self, filename):
+    print("Importing file " + filename)
     tree = ET.parse(filename)
     root = tree.getroot()
-
-    self.mainMap = mainMap
-
+    
     # Load all the nodes, using an extra components "tags"
     for node in root.iter('node'):
       this_node = CvtdNode(float(node.attrib['lat']), float(node.attrib['lon']))
@@ -250,10 +275,31 @@ class Importer:
           this_way.name = tag_vals[ix]
       self.roadList.append(this_way)
 
+  ####
+  # Application entry point for importing an XML OSM file
+  #
+  # filename is path of the OSM file
+  # mainMap is the CvtdMap that roads and nodes will be merged into
+  ####
+  def import_xml(self, filename, mainMap):
+    self.mainMap = mainMap
+    if os.path.isfile(filename):
+      self.import_xml_file(filename)
+    elif os.path.isdir(filename):
+      for innerFilename in os.listdir(filename):
+        filePath = filename + '/' + innerFilename
+        if os.path.isfile(filePath) and innerFilename.endswith('.osm'):
+          self.import_xml_file(filePath)
+
+    self.sanitize()
+
     # Give control to the user
     self.main()
 
 if __name__ == '__main__':
+  try:
+    filename = sys.argv[1]
     imp = Importer()
-    # imp.import_xml('/mnt/c/Users/ksmith/Downloads/map.osm', CvtdMap())
-    imp.import_xml('/mnt/c/Users/ksmith/Documents/Notes/CVTD/map.osm', CvtdMap())
+    imp.import_xml(filename, CvtdMap())
+  except IndexError:
+    print("Usage: python3 importer.py [OSM_filename]")

@@ -184,12 +184,17 @@ class CvtdRoad:
   # p is the point to insert
   ####
   def insert(self, p):
-    import pdb; pdb.set_trace()
-    for point_ix, point in enumerate(self.points[:-1]):
-      nextPoint = self.points[point_ix + 1]
-      # If the address is between nextPoint.addr and point.addr
-      if (p.addr - nextPoint.addr) * (point.addr - p.addr) > 0:
-        self.points.insert(point_ix, p)
+    # import pdb; pdb.set_trace()
+    if len(self.points) > 1:
+      for point_ix, point in enumerate(self.points[:-1]):
+        nextPoint = self.points[point_ix + 1]
+        # If the address is between nextPoint.addr and point.addr
+        if (p.addr - nextPoint.addr) * (point.addr - p.addr) > 0:
+          self.points.insert(point_ix + 1, p)
+          return
+    elif len(self.points) == 1:
+      if p.addr < self.points[0].addr:
+        self.points.insert(0, p)
         return
     self.points.append(p)
 

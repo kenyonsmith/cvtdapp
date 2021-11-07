@@ -2,24 +2,38 @@ import datetime
 import math
 import os
 
+from cvtdBus import CvtdBus
 from cvtdContainedRoadPoint import ContainedRoadPoint
 from cvtdNode import CvtdNode
 from cvtdRoad import CvtdRoad
 from cvtdRoadPoint import CvtdRoadPoint
+from cvtdRoute import CvtdRoute
+from cvtdRouteSegment import CvtdRouteSegment
 from cvtdUtil import CvtdUtil
+from gtfsShape import GtfsShape
 
 ####
 # A class containing a node list, road list, and other variables
 #
 # nodeList -> Array of Node objects
 # roadList -> Array of Road objects
-# routelist -> Array of Route objects
+# calendarDict -> Dictionary of GtfsCalendarEntry objects, where key is service id
+# routeDict -> Dictionary of GtfsRoute objects, where key is the route id
+# shapeDict -> Dictionary of GtfsShape objects, where key is the shape id
+# stopTimeDict -> Dictionary of GtfsStopTime objects, where key is (trip id, stop id)
+# stopDict -> Dictionary of GtfsStop objects, where key is the stop id
+# tripDict -> Dictionary of GtfsTrip objects, where key is the trip id
 ####
 class CvtdMap:
   def __init__(self):
     self.nodeList = []
     self.roadList = []
-    self.routeList = []
+    self.calendarDict = {}
+    self.routeDict = {}
+    self.shapeDict = {}
+    self.stopTimeDict = {}
+    self.stopDict = {}
+    self.tripDict = {}
 
   ####
   # validate calls validate() on every road and route, printing results to the screen
@@ -36,14 +50,14 @@ class CvtdMap:
         invalid.describe()
 
     invalidRoutes = []
-    for route in self.routeList:
-      if not route.validate():
+    for route in self.routeDict:
+      if not self.routeDict[route].validate():
         invalidRoutes.append(route)
 
     if len(invalidRoutes) > 0:
       print(f"The following {len(invalidRoutes)} routes are invalid: ")
       for invalid in invalidRoutes:
-        invalid.describe()
+        self.routeDict[invalid].describe()
 
     if len(invalidRoads) == 0 and len(invalidRoutes) == 0:
       print("You got a perfect score!")
@@ -215,8 +229,8 @@ class CvtdMap:
   #
   # intersections is the result of a find_intersecting_roads() call
   # forceDirection is 1, 0 or None
-  #  if forceDirection is 1, intersections will be keep only if the original road address is greater than segBeginAddr
-  #  if forceDirection is 0, intersections will be keep only if the original road address is less than segBeginAddr
+  #  if forceDirection is 1, intersections will be kept only if the original road address is greater than segBeginAddr
+  #  if forceDirection is 0, intersections will be kept only if the original road address is less than segBeginAddr
   #  if forceDirection is None, no filtering will be done
   # segBeginAddr is used when forceDirection is 1 or 0, as described above
   ####
@@ -229,7 +243,7 @@ class CvtdMap:
     return intersections
 
   ####
-  # read_roads reads a Python file and loads the results into NODE_LIST and ROAD_LIST
+  # read_roads reads a Python file and loads the results into this map
   #
   # filename is the file to read from (typically roads.txt)
   ####
@@ -290,6 +304,7 @@ class CvtdMap:
         s2 = ', '.join(["[" + str(p.node) + ", " + str(p.addr) + "]" for p in road.points])
         s3 = ']],\n'
         f.write(s1 + s2 + s3)
+      f.write("]\n\n")
       print("Write successful")
 
   ####
@@ -320,30 +335,3 @@ class CvtdMap:
         if not found:
           self.nodeList.append(fromNodeList[point.node])
       self.add_street(street)
-
-  ####
-  # bnum_to_route gets the route that has this bus number
-  #
-  # bnum is the bus number to look up
-  #
-  # return is a CvtdRoute
-  ####
-  def bnum_to_route(self, bnum):
-    for route in self.routeList:
-      if bnum in [bus.busNumber for bus in route.buses]:
-        return route
-
-  ####
-  # bnum_to_street_list gets a set of indices into self.roadList that this route uses
-  #
-  # bnum is the bus number to look up
-  #
-  # return is a set of integers that index into self.roadList, or {} if bus number not found
-  ####
-  def bnum_to_street_list(self, bnum):
-    route = self.bnum_to_route(bnum)
-    try:
-      return route.get_street_list()
-    except AttributeError:
-      return None
-

@@ -164,4 +164,100 @@ class CvtdUtil:
     
     # If result was set, return the value. Else return None
     return result
+  
+  ####
+  # split_quotes is like split, but it does not split on delimiters inside double or single quotes
+  #
+  # s is the string to split
+  # delim is the delimiter character
+  #
+  # return is a list of strings
+  ####
+  def split_quotes(s, delim):
+    result = []
+    lastMatch = -1
+    searchLoc = -1
+    nextQuote = -2
+    endQuote = -1
+    while True:
+      nextDelim = s.find(delim, searchLoc + 1)
+      if nextDelim == -1:
+        result.append(s[lastMatch+1:])
+        break
+      if nextQuote == -1 or nextDelim < nextQuote:
+        # We're good, just add it to result
+        result.append(s[lastMatch+1:nextDelim])
+        searchLoc = nextDelim
+        lastMatch = nextDelim
+      else:
+        # Update lastMatch to endQuote and refind nextQuote
+        searchLoc = endQuote
+        nextDouble = s.find('"', searchLoc + 1)
+        nextSingle = s.find("'", searchLoc + 1)
+        if nextDouble == -1 and nextSingle == -1:
+          nextQuote = -1
+        elif (nextDouble == -1 or (nextSingle < nextDouble)) and (nextSingle != -1):
+          nextQuote = nextSingle
+          endQuote = s.find("'", nextQuote + 1)
+        elif (nextSingle == -1 or (nextDouble < nextSingle)) and (nextDouble != -1):
+          nextQuote = nextDouble
+          endQuote = s.find('"', nextQuote + 1)
+    return result
+  
+  ####
+  # split_double_quotes is like split, but it does not split on delimiters inside double quotes
+  #
+  # s is the string to split
+  # delim is the delimiter character
+  #
+  # return is a list of strings
+  ####
+  def split_double_quotes(s, delim):
+    result = []
+    lastMatch = -1
+    searchLoc = -1
+    nextQuote = -2
+    endQuote = -1
+    while True:
+      nextDelim = s.find(delim, searchLoc + 1)
+      if nextDelim == -1:
+        result.append(s[lastMatch+1:])
+        break
+      if nextQuote == -1 or nextDelim < nextQuote:
+        # We're good, just add it to result
+        result.append(s[lastMatch+1:nextDelim])
+        searchLoc = nextDelim
+        lastMatch = nextDelim
+      else:
+        # Update lastMatch to endQuote and refind nextQuote
+        searchLoc = endQuote
+        nextDouble = s.find('"', searchLoc + 1)
+        if nextDouble == -1:
+          nextQuote = -1
+        else:
+          nextQuote = nextDouble
+          endQuote = s.find('"', nextQuote + 1)
+    return result
 
+  ####
+  # parse_csv parses a CSV file, using split_quotes on fields, expected a header row at the top
+  #
+  # filepath is the path to the CSV file
+  #
+  # return is a dictionary of lists, where each list is a list of strings for that header
+  ####
+  def parse_csv(filepath):
+    result = {}
+    with open(filepath, 'r') as f:
+      header = f.readline().strip()
+      keys = [k.strip() for k in header.split(',')]
+      for k in keys:
+        result[k] = []
+      for line in f:
+        vals = [v.strip() for v in CvtdUtil.split_double_quotes(line, ',')]
+        for vix, v in enumerate(vals):
+          try:
+            result[keys[vix]].append(v)
+          except IndexError:
+            print(f"Error: Tried to access key number {vix}")
+    return result

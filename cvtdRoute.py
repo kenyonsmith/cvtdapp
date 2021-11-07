@@ -5,6 +5,7 @@
 # buses -> List of Bus objects that use this route (many times there will only be one)
 # segments -> List of RouteSegment objects that delineate this route
 # stops -> List of RouteStop objects on this route
+# schedules -> List of RouteSchedule objects to define this route
 ####
 class CvtdRoute:
   def __init__(self):
@@ -12,6 +13,7 @@ class CvtdRoute:
     self.buses = []
     self.segments = []
     self.stops = []
+    self.schedules = []
 
   ####
   # describe prints all information about this route
@@ -94,4 +96,5 @@ class CvtdRoute:
   # return is a list of street indices
   ####
   def get_street_list(self):
-    return set(segment.roadIx for segment in self.segments)
+    if len(self.segments) > 0:
+      return set(segment.roadIx for segment in self.segments)

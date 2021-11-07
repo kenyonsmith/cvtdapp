@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from datetime import datetime
 import math
 import os
@@ -52,12 +53,12 @@ def print_print_list(print_list, count):
 # myMap is the CvtdMap, used to get list of valid streets for route 
 # locator is the CvtdBusLocator
 # print_list is the print list we are adding to
-# bnum is the bus number (key into locator) that we are adding to print list
+# rid is the bus route id (key into locator) that we are adding to print list
 # ix is the index into the locator's list of positions, most likely negative
 ####
-def add_to_print_list(myMap, locator, print_list, bnum, ix):
+def add_to_print_list(myMap, locator, print_list, rid, ix):
 	try:
-		position = locator.pos[bnum][ix]
+		position = locator.pos[rid][ix]
 		t = position.timestamp
 		lat = position.lat
 		lon = position.lon
@@ -66,16 +67,17 @@ def add_to_print_list(myMap, locator, print_list, bnum, ix):
 		return
 
 	# Determine route
-	valid_streets = myMap.bnum_to_street_list(bnum)
-	route = myMap.bnum_to_route(bnum)
+	route = myMap.find_route_by_rid(rid)
 	try:
 		routeName = route.name
+		validStreets = route.get_street_list()
 	except AttributeError:
 		routeName = "Unknown Route"
+		validStreets = None
 
 	# Compute address
-	roadIx, addr, error = myMap.compute_addr_repr(lat, lon, valid_streets)
-	if valid_streets is not None and error > 250:
+	roadIx, addr, error = myMap.compute_addr_repr(lat, lon, validStreets)
+	if validStreets is not None and error > 250:
 		roadIx, addr_off_route, error_off_route = myMap.compute_addr_repr(lat, lon, None)
 		if error_off_route < 200:
 			addr = "!" + addr_off_route 
@@ -84,8 +86,8 @@ def add_to_print_list(myMap, locator, print_list, bnum, ix):
 
 	# Determine if direction is actual or if it should be X
 	try:
-		lat_to_lat_diff = CvtdUtil.coord_to_ft(abs(locator.pos[bnum][ix - 1].lat - lat))
-		lon_to_lon_diff = CvtdUtil.coord_to_ft(abs(locator.pos[bnum][ix - 1].lon - lon))
+		lat_to_lat_diff = CvtdUtil.coord_to_ft(abs(locator.pos[rid][ix - 1].lat - lat))
+		lon_to_lon_diff = CvtdUtil.coord_to_ft(abs(locator.pos[rid][ix - 1].lon - lon))
 		pos_to_pos_diff = math.sqrt(lat_to_lat_diff ** 2 + lon_to_lon_diff ** 2)
 		if (pos_to_pos_diff < 40):
 			dir = Direction.X
@@ -96,10 +98,10 @@ def add_to_print_list(myMap, locator, print_list, bnum, ix):
 
 	# Add to list to print later
 	try:
-		print_list[bnum].append([t, addr, error, dir])
+		print_list[rid].append([t, addr, error, dir])
 	except KeyError:
-		print_list[bnum] = [routeName]
-		print_list[bnum].append([t, addr, error, dir])
+		print_list[rid] = [routeName]
+		print_list[rid].append([t, addr, error, dir])
 
 ####
 # pull_data pulls the XML feed and adds new positions to the Bus Locator, also returns new positions
@@ -107,7 +109,7 @@ def add_to_print_list(myMap, locator, print_list, bnum, ix):
 # key is the text to insert into the URL
 # locator is the Bus Locator where new positions will be added
 #
-# return is a set of bus numbers (keys into locator) with new data
+# return is a set of bus route ids (keys into locator) with new data
 ####
 def pull_data(key, locator):
 	NUM_ELEMENTS = 5
@@ -119,6 +121,7 @@ def pull_data(key, locator):
 	for bus in root:
 		for i in range(NUM_ELEMENTS - 1, 0, -1):
 			try:
+				rid = int(bus[2].text)
 				bnum = bus[3].text
 				rnum = bus[4].text
 				route = bus[5].text
@@ -129,12 +132,12 @@ def pull_data(key, locator):
 				if lat == 0.0 and lon == 0.0:
 					continue
 
-				entry = locator.find(bnum, t)
+				entry = locator.find(rid, t)
 				if entry is None:
 					newPos = CvtdBusPosition(t, lat, lon, direction)
-					newElements.add(rnum)
-					locator.insert(rnum, newPos)
-			except IndexError:
+					newElements.add(rid)
+					locator.insert_append(rid, newPos)
+			except (IndexError, ValueError):
 				continue
 	return newElements
 
@@ -161,6 +164,30 @@ def pull(myMap, locator, count, key):
 
 	# Print everything in the print list
 	print_print_list(print_list, count)
+
+####
+# list_locator prints all positions stored in locator to the screen
+#
+# myMap is the CvtdMap
+# locator is the CvtdBusLocator
+# command is the command used, to be parsed for a route number. Else route number will be queried
+####
+def list_locator(myMap, locator, command):
+	words = command.split()
+	if len(words) == 1:
+		word = input("Enter route number to display: ")
+		words.append(word)
+	if len(words) >= 2:
+		print_list = {}
+		for word in words[1:]:
+			import pdb; pdb.set_trace()
+			try:
+				for ix in range(len(locator.pos[word])):
+					route = myMap.find_route_by_rnum(word)
+					add_to_print_list(myMap, locator, print_list, route.buses[0].id, ix)
+			except KeyError:
+				print(f"Error: Unknown route: {word}")
+		print_print_list(print_list, 1)
   
 ####
 # get_filename parses a read or write command, and returns filename if given, else roads.txt
@@ -181,6 +208,7 @@ def get_filename(command):
 ####
 def show_help():
 	print("(1) Pull XML feed")
+	print("(2) List locator positions")
 	print("(r) Read roads file")
 	print("(q) Quit")
 
@@ -192,11 +220,14 @@ def main():
 		key = f.read()
 
 	myMap = CvtdMap()
-	locator = CvtdBusLocator()
+	locator = CvtdBusLocator('locator/')
+	locator.read_locator()
 	command = "help"
 	while command not in ["quit", "exit", "q", "e"]:
 		if command == "1":
 			pull(myMap, locator, 1, key)
+		elif command[0] == "2":
+			list_locator(myMap, locator, command)
 		elif command.lower().strip().split()[0] in ['r', 'read', 'o', 'open']:
 			myMap.read_roads(get_filename(command))
 		else:
