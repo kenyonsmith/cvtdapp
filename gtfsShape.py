@@ -1,3 +1,7 @@
+import math
+
+from cvtdUtil import CvtdUtil
+
 ####
 # A class representing a shape according to the GTFS standard
 #  NOTE: shapeId is not included here since it is typically the key to a shape dictionary
@@ -42,6 +46,39 @@ class GtfsShape:
   ####
   def compare_point_list(self, pointList):
     return [x.lat for x in self.pointList] == [x.lat for x in pointList] and [x.lon for x in self.pointList] == [x.lon for x in pointList]
+
+  ####
+  # get_min_point_error projects a point onto every segment of this shape
+  #  and returns the smallest error found
+  #
+  # lat is the latitude of the point to project
+  # lon is the longitude of the point to project
+  #
+  # return is the smallest error in ft
+  ####
+  def get_min_point_error(self, lat, lon):
+    min_pos_to_proj = 0x7FFFFFFF
+    
+    for point_ix, point in enumerate(self.pointList[:-1]):
+      blon = point.lon
+      blat = point.lat
+      elon = self.pointList[point_ix + 1].lon
+      elat = self.pointList[point_ix + 1].lat
+      street_sc, pos_sc, projection_sc, begin_or_end = CvtdUtil.sub_proj_ratio(lat, lon, blat, blon, elat, elon)
+
+      if projection_sc != 0.0:
+        proj_sc_fixed = min(projection_sc, street_sc)
+        try:
+          pos_to_proj = math.sqrt((pos_sc * pos_sc) - (proj_sc_fixed * proj_sc_fixed))
+        except ValueError:
+          pos_to_proj = 0
+
+        if pos_to_proj < min_pos_to_proj:
+          min_pos_to_proj = pos_to_proj
+      else:
+        print(f"Error [get_min_point_error] on shape: two adjacent points with same node")
+      
+    return CvtdUtil.coord_to_ft(min_pos_to_proj)
 
 ####
 # compute_route_completion 

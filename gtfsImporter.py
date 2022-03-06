@@ -20,6 +20,7 @@ class GtfsImporter:
   # mainMap is the CvtdMap that calendar will be written to
   ####
   def import_calendar(dirPath, myMap):
+    print("Importing calendar...")
     calendarDict = {}
     calendar = CvtdUtil.parse_csv(dirPath + "/calendar.txt")
     strFormat = '%Y%m%d'
@@ -50,6 +51,7 @@ class GtfsImporter:
   # mainMap is the CvtdMap that routes will be written to
   ####
   def import_routes(dirPath, myMap):
+    print("Importing routes...")
     routeDict = {}
     routes = CvtdUtil.parse_csv(dirPath + "/routes.txt")
     try:
@@ -75,6 +77,7 @@ class GtfsImporter:
   # mainMap is the CvtdMap that roads and nodes will be merged into
   ####
   def import_shapes(dirPath, myMap):
+    print("Importing shapes...")
     shapeDict = {}
     shapes = CvtdUtil.parse_csv(dirPath + "/shapes.txt")
     try:
@@ -105,6 +108,7 @@ class GtfsImporter:
   # mainMap is the CvtdMap that stops will be written to
   ####
   def import_stops(dirPath, myMap):
+    print("Importing stops...")
     stopDict = {}
     stops = CvtdUtil.parse_csv(dirPath + "/stops.txt")
     try:
@@ -134,6 +138,7 @@ class GtfsImporter:
   # mainMap is the CvtdMap that stop times will be written to
   ####
   def import_stop_times(dirPath, myMap):
+    print("Importing stop times...")
     stopTimeDict = {}
     stopTimes = CvtdUtil.parse_csv(dirPath + "/stop_times.txt")
     try:
@@ -157,6 +162,7 @@ class GtfsImporter:
   # mainMap is the CvtdMap that trips will be written to
   ####
   def import_trips(dirPath, myMap):
+    print("Importing trips...")
     tripDict = {}
     trips = CvtdUtil.parse_csv(dirPath + "/trips.txt")
     try:

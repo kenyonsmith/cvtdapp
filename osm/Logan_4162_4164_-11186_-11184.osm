@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.6" generator="Overpass API 0.7.56.9 76e5016d">
+<osm version="0.6" generator="Overpass API 0.7.57.1 74a55df1">
 <note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
-<meta osm_base="2021-07-25T05:44:13Z"/>
+<meta osm_base="2021-11-19T04:01:02Z"/>
 
   <node id="82897395" lat="41.6266494" lon="-111.8471837"/>
   <node id="82897397" lat="41.6266250" lon="-111.8460780"/>
@@ -29,7 +29,11 @@
   <node id="82913692" lat="41.6237122" lon="-111.8555841"/>
   <node id="82913694" lat="41.6238651" lon="-111.8556173"/>
   <node id="82913696" lat="41.6249436" lon="-111.8555748"/>
-  <node id="82913698" lat="41.6277750" lon="-111.8555195"/>
+  <node id="82913698" lat="41.6277750" lon="-111.8555190">
+    <tag k="direction" v="both"/>
+    <tag k="highway" v="stop"/>
+    <tag k="stop" v="all"/>
+  </node>
   <node id="82913700" lat="41.6298579" lon="-111.8554156"/>
   <node id="82913702" lat="41.6319779" lon="-111.8553357"/>
   <node id="82913920" lat="41.6266249" lon="-111.8403514">
@@ -1909,6 +1913,7 @@
     <tag k="place" v="town"/>
     <tag k="population" v="8619"/>
     <tag k="source:population" v="Census 2019 Estimate"/>
+    <tag k="wikidata" v="Q129996"/>
   </node>
   <way id="10080312">
     <nd ref="82913702"/>
@@ -2162,8 +2167,9 @@
     <nd ref="5298057370"/>
     <nd ref="5298057366"/>
     <nd ref="82921130"/>
-    <tag k="highway" v="residential"/>
+    <tag k="highway" v="unclassified"/>
     <tag k="name" v="West 300 South"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="300"/>
@@ -4138,6 +4144,7 @@
   <way id="452308929">
     <nd ref="82917504"/>
     <nd ref="5316951528"/>
+    <nd ref="9222069479"/>
     <nd ref="82917505"/>
     <nd ref="82917480"/>
     <nd ref="82917482"/>
@@ -4148,10 +4155,12 @@
     <nd ref="82917492"/>
     <nd ref="82917494"/>
     <nd ref="82913698"/>
-    <tag k="highway" v="residential"/>
+    <tag k="highway" v="unclassified"/>
     <tag k="lane_markings" v="no"/>
     <tag k="lanes" v="2"/>
+    <tag k="maxspeed" v="30 mph"/>
     <tag k="name" v="East 300 South"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="300"/>
@@ -7072,6 +7081,7 @@
     <member type="way" ref="943701276" role=""/>
     <member type="way" ref="119006822" role=""/>
     <member type="way" ref="683815069" role=""/>
+    <member type="way" ref="1002818970" role=""/>
     <member type="way" ref="943678569" role=""/>
     <member type="way" ref="10085582" role=""/>
     <member type="way" ref="454043213" role=""/>

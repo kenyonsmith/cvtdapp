@@ -2,20 +2,18 @@ import datetime
 import math
 import os
 
-from cvtdBus import CvtdBus
 from cvtdContainedRoadPoint import ContainedRoadPoint
 from cvtdNode import CvtdNode
 from cvtdRoad import CvtdRoad
 from cvtdRoadPoint import CvtdRoadPoint
-from cvtdRoute import CvtdRoute
-from cvtdRouteSegment import CvtdRouteSegment
 from cvtdUtil import CvtdUtil
+from gtfsImporter import GtfsImporter
 from gtfsShape import GtfsShape
 
 ####
 # A class containing a node list, road list, and other variables
 #
-# nodeList -> Array of Node objects
+# nodeDict -> Dictionary of CvtdNode objects, where key is OSM node id
 # roadList -> Array of Road objects
 # calendarDict -> Dictionary of GtfsCalendarEntry objects, where key is service id
 # routeDict -> Dictionary of GtfsRoute objects, where key is the route id
@@ -23,10 +21,11 @@ from gtfsShape import GtfsShape
 # stopTimeDict -> Dictionary of GtfsStopTime objects, where key is (trip id, stop id)
 # stopDict -> Dictionary of GtfsStop objects, where key is the stop id
 # tripDict -> Dictionary of GtfsTrip objects, where key is the trip id
+# gtfsLocation is the string pointing to the folder where GTFS data is found
 ####
 class CvtdMap:
   def __init__(self):
-    self.nodeList = []
+    self.nodeDict = {}
     self.roadList = []
     self.calendarDict = {}
     self.routeDict = {}
@@ -34,6 +33,7 @@ class CvtdMap:
     self.stopTimeDict = {}
     self.stopDict = {}
     self.tripDict = {}
+    self.gtfsLocation = ""
 
   ####
   # validate calls validate() on every road and route, printing results to the screen
@@ -63,6 +63,34 @@ class CvtdMap:
       print("You got a perfect score!")
 
   ####
+  # import_google_directory opens up a Google directory and reads:
+  #  stops.txt into self.stopDict
+  #  routes.txt into self.routeDict
+  ####
+  def import_google_directory(self):
+    doImport = False
+    if self.gtfsLocation != "":
+      if input(f"You have already imported the following GTFS directory: {self.gtfsLocation}. Import another (y/n)? ") == 'y':
+        doImport = True
+        self.calendarDict = {}
+        self.routeDict = {}
+        self.shapeDict = {}
+        self.stopTimeDict = {}
+        self.stopDict = {}
+        self.tripDict = {}
+    else:
+      doImport = True
+
+    if doImport:
+      dirPath = input("Enter the absolute or relative path to the directory containing Google Transit files: ")
+      try:
+        GtfsImporter.import_google_directory(dirPath, self)
+        self.gtfsLocation = dirPath
+      except FileNotFoundError:
+        print("Error: That directory is not a valid GTFS directory")
+
+
+  ####
   # compute_proj_ratio finds the street that the given node is most likely on
   #
   # self is the containing CvtdMap
@@ -83,7 +111,7 @@ class CvtdMap:
 
     for street_ix, street in enumerate(self.roadList):
       if valid_streets is None or street_ix in valid_streets:
-        point_ix, proj_ratio, pos_to_proj = street.compute_proj_ratio(lat, lon, self.nodeList)
+        point_ix, proj_ratio, pos_to_proj = street.compute_proj_ratio(lat, lon, self.nodeDict)
 
         if pos_to_proj < min_pos_to_proj:
           min_street_ix = street_ix
@@ -151,15 +179,19 @@ class CvtdMap:
     return plist
     
   ####
-  # generate_dlist generates a list of distances from each node to the given point
+  # generate_ddict generates a dictionary of distances from each node to the given point
   #
   # lat is the latitude of the point to which distance will be calculated
   # lon is the longitude of the point to which distance will be calculated
   #
-  # return[0] is the list, an unsorted list of doubles that aligns with NODE_LIST
+  # return[0] is the dictionary, a dictionary of doubles that aligns with self.nodeDict
   ####
-  def generate_dlist(self, lat, lon):
-    return [math.sqrt(((lat - a.lat) * (lat - a.lat)) + ((lon - a.lon) * (lon - a.lon))) for a in self.nodeList]
+  def generate_ddict(self, lat, lon):
+    result = {}
+    for key in self.nodeDict:
+      a = self.nodeDict[key]
+      result[key] = math.sqrt(((lat - a.lat) * (lat - a.lat)) + ((lon - a.lon) * (lon - a.lon)))
+    return result
     
   ####
   # search_street_by_name is a subroutine that returns streets that match a given name
@@ -204,16 +236,16 @@ class CvtdMap:
     # Find roads that intersect with each segment individually
     road = self.roadList[road_ix]
     for point_ix, point in enumerate(road.points[:-1]):
-      n1s = self.nodeList[point.node]
-      n1e = self.nodeList[road.points[point_ix + 1].node]
+      n1s = self.nodeDict[point.node]
+      n1e = self.nodeDict[road.points[point_ix + 1].node]
       
       # Loop through all roads to see if they intersect with this segment
       for check_ix, check_road in enumerate(self.roadList):
         # Don't check to see if a road intersects with itself
         if check_ix != road_ix:
           for check_point_ix, check_point in enumerate(check_road.points[:-1]):
-            n2s = self.nodeList[check_point.node]
-            n2e = self.nodeList[check_road.points[check_point_ix + 1].node]
+            n2s = self.nodeDict[check_point.node]
+            n2e = self.nodeDict[check_road.points[check_point_ix + 1].node]
             
             cross = CvtdUtil.get_line_intersection(n1s, n1e, n2s, n2e)
             if cross:
@@ -248,7 +280,7 @@ class CvtdMap:
   # filename is the file to read from (typically roads.txt)
   ####
   def read_roads(self, filename):
-    self.nodeList = []
+    self.nodeDict = {}
     self.roadList = []
   
     editor = ""
@@ -260,10 +292,11 @@ class CvtdMap:
             editor = "NODE_LIST"
           elif road.strip() == "ROAD_LIST = [":
             editor = "ROAD_LIST"
-          elif editor == "NODE_LIST" and len(road.strip().split(',')) == 3:
+          elif editor == "NODE_LIST" and len(road.strip().split(',')) == 4:
             lat = float(road.split(',')[0].strip().replace('[',''))
             lon = float(road.split(',')[1].strip().replace(']',''))
-            self.nodeList.append(CvtdNode(lat, lon))
+            key = int(road.split(',')[2].strip().replace(']',''))
+            self.nodeDict[key] = CvtdNode(lat, lon)
           elif editor == "ROAD_LIST" and len(road.strip().split('",')) == 3:
             this_road = CvtdRoad()
             this_road.name = road.split('",')[0].replace('[','').replace('"','').strip()
@@ -272,7 +305,7 @@ class CvtdMap:
             points = [p.replace('[','').replace(']','').replace(',\n','').strip() for p in points]
             this_road.points = [CvtdRoadPoint(int(node), int(addr)) for node, addr in [x.split(', ') for x in points]]
             self.roadList.append(this_road)
-        print("Read successful, read {} nodes and {} roads".format(len(self.nodeList), len(self.roadList)))
+        print("Read successful, read {} nodes and {} roads".format(len(self.nodeDict), len(self.roadList)))
     except FileNotFoundError:
       print("Error: File \"{}\" does not exist".format(filename))
 
@@ -294,8 +327,9 @@ class CvtdMap:
 
     with open(filename, 'w') as f:
       f.write("NODE_LIST = [\n")
-      for node in self.nodeList:
-        f.write("    [{}, {}],\n".format(node.lat, node.lon))
+      for key in self.nodeDict:
+        node = self.nodeDict[key]
+        f.write("    [{}, {}, {}],\n".format(node.lat, node.lon, key))
       f.write("]\n\n")
 
       f.write("ROAD_LIST = [\n")
@@ -322,16 +356,33 @@ class CvtdMap:
   
   ####
   # add_street_with_nodes adds a street to the map, copying nodes from an existing node list and merging them into this node list
+  #
+  # street is the CvtdRoad to add
+  # fromNodeDict is the dictionary, with key being node number and value being a CvtdNode, associated with street
   ####
-  def add_street_with_nodes(self, street, fromNodeList):
+  def add_street_with_nodes(self, street, fromNodeDict):
     if street.validate():
       for point in street.points:
-        # Search in the current node list for a node almost equal to this node
-        found = False
-        for nodeIx, node in enumerate(self.nodeList):
-          if (abs(node.lat - fromNodeList[point.node].lat) < 0.000001) and (abs(node.lon - fromNodeList[point.node].lon) < 0.000001):
-            point.node = nodeIx
-            break
-        if not found:
-          self.nodeList.append(fromNodeList[point.node])
+        if point.node in self.nodeDict:
+          # Hopefully they are the same
+          if not self.nodeDict[point.node].compare_node(fromNodeDict[point.node]):
+            print(f"Warning: Replacing node {point.node} with new value: {self.nodeDict[point.node]} to {fromNodeDict[point.node]}")
+        self.nodeDict[point.node] = fromNodeDict[point.node]
       self.add_street(street)
+  
+  ####
+  # replace_street_with_nodes replaces the given street with a new street, copying nodes from an existing node list and merging them into this node list
+  #
+  # street is the CvtdRoad to add
+  # fromNodeDict is the dictionary, with key being node number and value being a CvtdNode, associated with street
+  # replaceIx is the index indicating where to replace street
+  ####
+  def replace_street_with_nodes(self, street, fromNodeDict, replaceIx):
+    if street.validate():
+      for point in street.points:
+        if point.node in self.nodeDict:
+          # Hopefully they are the same
+          if not self.nodeDict[point.node].compare_node(fromNodeDict[point.node]):
+            print(f"Warning: Replacing node {point.node} with new value: {self.nodeDict[point.node]} to {fromNodeDict[point.node]}")
+        self.nodeDict[point.node] = fromNodeDict[point.node]
+      self.roadList[replaceIx] = street

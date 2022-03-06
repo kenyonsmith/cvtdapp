@@ -12,7 +12,7 @@ from cvtdRoadPoint import CvtdRoadPoint
 from cvtdRoute import CvtdRoute
 from cvtdRouteSegment import CvtdRouteSegment
 from cvtdUtil import CvtdUtil
-from gtfsImporter import GtfsImporter
+from importer import Importer
 
 # TO DO:
 #  Test roadTool!
@@ -21,8 +21,6 @@ from gtfsImporter import GtfsImporter
 #  Write OSM reader
 #  Execute OSM reader to get a better roads.txt file
 #  Store bus locations to disk
-
-GOOGLE_DIRECTORY = None
 
 ####
 # parse_gps attempts to parse a string into separate lat and lon portions
@@ -228,13 +226,13 @@ def search_streets(map):
     edit_delete_street(map, ix)
 
 ####
-# import_google_directory opens up a Google directory and reads:
-#  stops.txt into myMap.stopDict
-#  routes.txt into myMap.routeDict
+# import_osm opens up the provided OSM file and read nodes and roads, helping user to add them into myMap
 ####
-def import_google_directory(myMap):
-  dirPath = input("Enter the absolute or relative path to the directory containing Google Transit files: ")
-  GtfsImporter.import_google_directory(dirPath, myMap)
+def import_osm(myMap):
+  filePath = input("Enter the absolute or relative path to the OSM file: ")
+  if filePath != "":
+    Importer.begin_import(filePath, myMap)
+    show_help()
 
 ####
 # new_node allows the user to add a node
@@ -327,6 +325,7 @@ def show_help():
   print("(9) Add new landmark")
   print("(10) Search landmarks")
   print("(11) Import Google Transit files")
+  print("(12) Import OpenStreetMap files")
   print("(r) Read roads file")
   print("(w) Write roads file")
   print("(v) Validate current map")
@@ -367,7 +366,9 @@ def main():
     elif command == "8":
       pass
     elif command == "11":
-      import_google_directory(myMap)
+      myMap.import_google_directory()
+    elif command == "12":
+      import_osm(myMap)
     elif command == 'v':
       myMap.validate()
     elif command.lower().strip().split()[0] in ['r', 'read', 'o', 'open']:

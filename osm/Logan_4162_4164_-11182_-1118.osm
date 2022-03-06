@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.6" generator="Overpass API 0.7.56.9 76e5016d">
+<osm version="0.6" generator="Overpass API 0.7.57 93a4d346">
 <note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
-<meta osm_base="2021-07-25T05:44:13Z"/>
+<meta osm_base="2021-11-19T04:01:58Z"/>
 
   <node id="82888115" lat="41.6369255" lon="-111.8114248"/>
   <node id="82888117" lat="41.6369400" lon="-111.8115725"/>
@@ -42,7 +42,7 @@
   <node id="82899065" lat="41.6324649" lon="-111.8135704"/>
   <node id="82899067" lat="41.6328010" lon="-111.8139890"/>
   <node id="82899069" lat="41.6329481" lon="-111.8140253"/>
-  <node id="82899071" lat="41.6331498" lon="-111.8139828"/>
+  <node id="82899071" lat="41.6331421" lon="-111.8139486"/>
   <node id="82899073" lat="41.6340716" lon="-111.8147536"/>
   <node id="82903865" lat="41.6396741" lon="-111.8130159"/>
   <node id="82903867" lat="41.6395672" lon="-111.8131750"/>
@@ -186,7 +186,10 @@
   <node id="2559441004" lat="41.6263163" lon="-111.8197330"/>
   <node id="2559441006" lat="41.6266001" lon="-111.8199983"/>
   <node id="2559441007" lat="41.6266316" lon="-111.8198663"/>
-  <node id="2559441009" lat="41.6272000" lon="-111.8198767"/>
+  <node id="2559441009" lat="41.6272000" lon="-111.8198760">
+    <tag k="highway" v="traffic_signals"/>
+    <tag k="traffic_signals" v="signal"/>
+  </node>
   <node id="2559441014" lat="41.6284184" lon="-111.8134704"/>
   <node id="2559441015" lat="41.6293266" lon="-111.8170721"/>
   <node id="2559441016" lat="41.6295883" lon="-111.8181240"/>
@@ -375,7 +378,6 @@
   <node id="4728929120" lat="41.6287423" lon="-111.8173454"/>
   <node id="4728929123" lat="41.6294211" lon="-111.8189659">
     <tag k="leisure" v="playground"/>
-    <tag k="name" v="Playground"/>
   </node>
   <node id="4733192154" lat="41.6292785" lon="-111.8171112"/>
   <node id="4733192155" lat="41.6294747" lon="-111.8178830"/>
@@ -1083,6 +1085,52 @@
   <node id="8904842537" lat="41.6303547" lon="-111.8065903"/>
   <node id="8904842538" lat="41.6252155" lon="-111.8134176"/>
   <node id="8904842540" lat="41.6303712" lon="-111.8045918"/>
+  <node id="9222069450" lat="41.6276957" lon="-111.8049934"/>
+  <node id="9222069451" lat="41.6277085" lon="-111.8052937"/>
+  <node id="9222069452" lat="41.6278146" lon="-111.8055084"/>
+  <node id="9222069453" lat="41.6279849" lon="-111.8057758"/>
+  <node id="9222069454" lat="41.6280738" lon="-111.8060070"/>
+  <node id="9222069455" lat="41.6282293" lon="-111.8063471"/>
+  <node id="9222069456" lat="41.6284835" lon="-111.8067467"/>
+  <node id="9222069457" lat="41.6287723" lon="-111.8072684"/>
+  <node id="9222069458" lat="41.6288932" lon="-111.8074501"/>
+  <node id="9222069459" lat="41.6291030" lon="-111.8077836"/>
+  <node id="9222069460" lat="41.6293745" lon="-111.8081633"/>
+  <node id="9222069461" lat="41.6295523" lon="-111.8085266"/>
+  <node id="9222069462" lat="41.6298731" lon="-111.8090681"/>
+  <node id="9222069463" lat="41.6302557" lon="-111.8096526"/>
+  <node id="9222069464" lat="41.6303421" lon="-111.8097946"/>
+  <node id="9222069465" lat="41.6307716" lon="-111.8103131"/>
+  <node id="9222069466" lat="41.6310529" lon="-111.8107126"/>
+  <node id="9222069467" lat="41.6312183" lon="-111.8109471"/>
+  <node id="9222069468" lat="41.6313540" lon="-111.8111881"/>
+  <node id="9222069469" lat="41.6314626" lon="-111.8113565"/>
+  <node id="9222069470" lat="41.6318773" lon="-111.8118221"/>
+  <node id="9222069471" lat="41.6322302" lon="-111.8123043"/>
+  <node id="9222069472" lat="41.6328078" lon="-111.8130539"/>
+  <node id="9222069473" lat="41.6331780" lon="-111.8135261"/>
+  <node id="9222069474" lat="41.6332101" lon="-111.8137044"/>
+  <node id="9222069475" lat="41.6332446" lon="-111.8138374"/>
+  <node id="9222069476" lat="41.6332596" lon="-111.8138219">
+    <tag k="direction" v="forward"/>
+    <tag k="highway" v="stop"/>
+  </node>
+  <node id="9222069477" lat="41.6271770" lon="-111.8135723">
+    <tag k="direction" v="backward"/>
+    <tag k="highway" v="stop"/>
+  </node>
+  <node id="9262002960" lat="41.6392973" lon="-111.8098719">
+    <tag k="power" v="pole"/>
+  </node>
+  <node id="9262002961" lat="41.6393359" lon="-111.8094446">
+    <tag k="power" v="pole"/>
+  </node>
+  <node id="9262002962" lat="41.6377355" lon="-111.8101443">
+    <tag k="power" v="pole"/>
+  </node>
+  <node id="9262002963" lat="41.6377250" lon="-111.8096982">
+    <tag k="power" v="pole"/>
+  </node>
   <way id="10080569">
     <nd ref="82888115"/>
     <nd ref="82888117"/>
@@ -1200,8 +1248,13 @@
     <nd ref="82899067"/>
     <nd ref="82899069"/>
     <nd ref="82899071"/>
+    <nd ref="9222069475"/>
+    <nd ref="9222069476"/>
     <nd ref="5329900348"/>
     <tag k="highway" v="unclassified"/>
+    <tag k="maxspeed" v="20 mph"/>
+    <tag k="name" v="Hammer Road"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:reviewed" v="no"/>
@@ -1241,8 +1294,11 @@
     <nd ref="4500800981"/>
     <nd ref="2559441014"/>
     <nd ref="82899061"/>
+    <tag k="alt_name" v="South 800 East"/>
     <tag k="highway" v="unclassified"/>
-    <tag k="name" v="South 800 East"/>
+    <tag k="maxspeed" v="20 mph"/>
+    <tag k="name" v="Hammer Road"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="800 East"/>
@@ -3688,6 +3744,7 @@
   </way>
   <way id="753240522">
     <nd ref="7038037742"/>
+    <nd ref="9222069477"/>
     <nd ref="7038037741"/>
     <nd ref="4492957592"/>
     <nd ref="5320718844"/>
@@ -3878,7 +3935,6 @@
     <nd ref="7714978293"/>
     <nd ref="7714978294"/>
     <tag k="highway" v="path"/>
-    <tag k="name" v="Bonneville Shoreline Trail"/>
   </way>
   <way id="826307404">
     <nd ref="7714978295"/>
@@ -3969,6 +4025,7 @@
     <tag k="highway" v="tertiary"/>
     <tag k="name" v="Blacksmith Fork Canyon Road"/>
     <tag k="ref" v="UT 101"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A31"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="Highway 101"/>
@@ -3990,9 +4047,11 @@
     <nd ref="82923896"/>
     <nd ref="82923898"/>
     <nd ref="5329900348"/>
+    <tag k="alt_name" v="Blacksmith Fork Canyon Road"/>
     <tag k="highway" v="tertiary"/>
-    <tag k="name" v="Blacksmith Fork Canyon Road"/>
+    <tag k="name" v="Highway 101"/>
     <tag k="ref" v="UT 101"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A31"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="Highway 101"/>
@@ -4009,6 +4068,7 @@
     <tag k="layer" v="1"/>
     <tag k="name" v="Blacksmith Fork Canyon Road"/>
     <tag k="ref" v="UT 101"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A31"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="Highway 101"/>
@@ -5437,6 +5497,7 @@
     <tag k="highway" v="secondary"/>
     <tag k="name" v="Blacksmith Fork Canyon Road"/>
     <tag k="ref" v="UT 101"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A31"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="Highway 101"/>
@@ -5755,6 +5816,37 @@
     <tag k="admin_level" v="8"/>
     <tag k="boundary" v="administrative"/>
   </way>
+  <way id="998842818">
+    <nd ref="6346811099"/>
+    <nd ref="9222069450"/>
+    <nd ref="9222069451"/>
+    <nd ref="9222069452"/>
+    <nd ref="9222069453"/>
+    <nd ref="9222069454"/>
+    <nd ref="9222069455"/>
+    <nd ref="9222069456"/>
+    <nd ref="9222069457"/>
+    <nd ref="9222069458"/>
+    <nd ref="9222069459"/>
+    <nd ref="9222069460"/>
+    <nd ref="9222069461"/>
+    <nd ref="9222069462"/>
+    <nd ref="9222069463"/>
+    <nd ref="9222069464"/>
+    <nd ref="9222069465"/>
+    <nd ref="9222069466"/>
+    <nd ref="9222069467"/>
+    <nd ref="9222069468"/>
+    <nd ref="9222069469"/>
+    <nd ref="9222069470"/>
+    <nd ref="9222069471"/>
+    <nd ref="9222069472"/>
+    <nd ref="9222069473"/>
+    <nd ref="9222069474"/>
+    <nd ref="9222069475"/>
+    <tag k="highway" v="path"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
   <relation id="198951">
     <member type="node" ref="8904833693" role="admin_centre"/>
     <member type="way" ref="658457321" role="inner"/>
@@ -5826,10 +5918,12 @@
     <member type="way" ref="731797979" role=""/>
     <member type="way" ref="10215351" role=""/>
     <member type="way" ref="115711730" role=""/>
-    <member type="way" ref="115232117" role=""/>
     <member type="way" ref="10201284" role=""/>
-    <member type="way" ref="778431916" role=""/>
+    <member type="way" ref="115232117" role=""/>
+    <member type="way" ref="971037348" role=""/>
     <member type="way" ref="117960268" role=""/>
+    <member type="way" ref="778431916" role=""/>
+    <member type="way" ref="1000403721" role=""/>
     <member type="way" ref="10219499" role=""/>
     <member type="way" ref="778412450" role=""/>
     <member type="way" ref="10211182" role=""/>
@@ -5855,16 +5949,23 @@
     <member type="way" ref="220689779" role=""/>
     <member type="way" ref="356330481" role=""/>
     <member type="way" ref="361362970" role=""/>
+    <member type="way" ref="969844590" role=""/>
     <member type="way" ref="706477196" role=""/>
+    <member type="way" ref="977475388" role=""/>
+    <member type="way" ref="977475387" role=""/>
+    <member type="way" ref="957251207" role=""/>
     <member type="way" ref="854397225" role=""/>
-    <member type="way" ref="284022161" role=""/>
     <member type="way" ref="854397227" role=""/>
     <member type="way" ref="283437309" role=""/>
-    <member type="way" ref="957251207" role=""/>
+    <member type="way" ref="284022161" role=""/>
     <member type="way" ref="425244576" role=""/>
-    <member type="way" ref="512166860" role=""/>
-    <member type="way" ref="512166857" role=""/>
+    <member type="way" ref="976746853" role=""/>
+    <member type="way" ref="976746852" role=""/>
     <member type="way" ref="357084742" role=""/>
+    <member type="way" ref="512166857" role=""/>
+    <member type="way" ref="512166860" role=""/>
+    <member type="way" ref="974117365" role=""/>
+    <member type="way" ref="974117364" role=""/>
     <member type="way" ref="538358257" role=""/>
     <member type="way" ref="854397228" role=""/>
     <member type="way" ref="538356165" role=""/>
@@ -5876,18 +5977,22 @@
     <member type="way" ref="234351798" role=""/>
     <member type="way" ref="929054211" role=""/>
     <member type="way" ref="35421937" role=""/>
-    <member type="way" ref="148490377" role=""/>
-    <member type="way" ref="41346604" role=""/>
+    <member type="way" ref="34040680" role=""/>
+    <member type="way" ref="957213482" role=""/>
+    <member type="way" ref="957213480" role=""/>
+    <member type="way" ref="957213481" role=""/>
+    <member type="way" ref="854397230" role=""/>
+    <member type="way" ref="849959642" role=""/>
     <member type="way" ref="148490379" role=""/>
     <member type="way" ref="551525673" role=""/>
-    <member type="way" ref="849959642" role=""/>
-    <member type="way" ref="854397230" role=""/>
-    <member type="way" ref="957213481" role=""/>
+    <member type="way" ref="982039787" role=""/>
+    <member type="way" ref="982039791" role=""/>
+    <member type="way" ref="982039776" role=""/>
+    <member type="way" ref="982039777" role=""/>
+    <member type="way" ref="148490377" role=""/>
+    <member type="way" ref="41346604" role=""/>
     <member type="way" ref="33909893" role=""/>
     <member type="way" ref="551525674" role=""/>
-    <member type="way" ref="957213482" role=""/>
-    <member type="way" ref="34040680" role=""/>
-    <member type="way" ref="957213480" role=""/>
     <member type="way" ref="34039953" role=""/>
     <member type="way" ref="275585638" role=""/>
     <member type="way" ref="881449729" role=""/>
@@ -5897,10 +6002,17 @@
     <member type="way" ref="444854732" role=""/>
     <member type="way" ref="444854731" role=""/>
     <member type="way" ref="444854730" role=""/>
+    <member type="way" ref="986840178" role=""/>
     <member type="way" ref="444854729" role=""/>
+    <member type="way" ref="987029069" role=""/>
+    <member type="way" ref="987029068" role=""/>
     <member type="way" ref="33992703" role=""/>
     <member type="way" ref="929054244" role=""/>
     <member type="way" ref="34039958" role=""/>
+    <member type="way" ref="929054235" role=""/>
+    <member type="way" ref="34040626" role=""/>
+    <member type="way" ref="33961734" role=""/>
+    <member type="way" ref="154624115" role=""/>
     <member type="way" ref="731731079" role=""/>
     <member type="way" ref="957213479" role=""/>
     <member type="way" ref="444854728" role=""/>
@@ -5912,13 +6024,9 @@
     <member type="way" ref="444854725" role=""/>
     <member type="way" ref="444854724" role=""/>
     <member type="way" ref="444854722" role=""/>
-    <member type="way" ref="929054235" role=""/>
     <member type="way" ref="854392431" role=""/>
     <member type="way" ref="854392432" role=""/>
     <member type="way" ref="838800701" role=""/>
-    <member type="way" ref="154624115" role=""/>
-    <member type="way" ref="34040626" role=""/>
-    <member type="way" ref="33961734" role=""/>
     <member type="way" ref="10088412" role=""/>
     <member type="way" ref="501567734" role=""/>
     <member type="way" ref="42479186" role=""/>
@@ -5966,7 +6074,6 @@
     <member type="way" ref="66224046" role=""/>
     <member type="way" ref="66224071" role=""/>
     <member type="way" ref="66224037" role=""/>
-    <member type="way" ref="60946507" role=""/>
     <member type="way" ref="46774410" role=""/>
     <member type="way" ref="46774411" role=""/>
     <member type="way" ref="337985937" role=""/>
@@ -5978,13 +6085,16 @@
     <member type="way" ref="230172766" role=""/>
     <member type="way" ref="768415533" role=""/>
     <member type="way" ref="159268391" role=""/>
-    <member type="way" ref="137607452" role=""/>
-    <member type="way" ref="219170366" role=""/>
-    <member type="way" ref="236020415" role=""/>
     <member type="way" ref="895719144" role=""/>
     <member type="way" ref="768415531" role=""/>
     <member type="way" ref="768415544" role=""/>
     <member type="way" ref="39945206" role=""/>
+    <member type="way" ref="60946507" role=""/>
+    <member type="way" ref="137607452" role=""/>
+    <member type="way" ref="219170366" role=""/>
+    <member type="way" ref="978888099" role=""/>
+    <member type="way" ref="978888098" role=""/>
+    <member type="way" ref="236020415" role=""/>
     <member type="way" ref="39664295" role=""/>
     <member type="way" ref="159268399" role=""/>
     <member type="way" ref="277481432" role=""/>
@@ -6003,6 +6113,8 @@
     <member type="way" ref="358297679" role=""/>
     <member type="way" ref="98074455" role=""/>
     <member type="way" ref="768562812" role=""/>
+    <member type="way" ref="978575709" role=""/>
+    <member type="way" ref="978556798" role=""/>
     <member type="way" ref="722063057" role=""/>
     <member type="way" ref="722063059" role=""/>
     <member type="way" ref="722063060" role=""/>
@@ -6033,6 +6145,8 @@
     <member type="way" ref="10081483" role=""/>
     <member type="way" ref="10083086" role=""/>
     <member type="way" ref="828329205" role=""/>
+    <member type="way" ref="1000527036" role=""/>
+    <member type="way" ref="1000527037" role=""/>
     <member type="way" ref="828329225" role=""/>
     <member type="way" ref="828329226" role=""/>
     <member type="way" ref="375004524" role=""/>
@@ -6121,6 +6235,8 @@
     <member type="way" ref="10081483" role=""/>
     <member type="way" ref="10083086" role=""/>
     <member type="way" ref="828329205" role=""/>
+    <member type="way" ref="1000527036" role=""/>
+    <member type="way" ref="1000527037" role=""/>
     <member type="way" ref="828329225" role=""/>
     <member type="way" ref="828329226" role=""/>
     <member type="way" ref="375004524" role=""/>
@@ -6147,6 +6263,7 @@
     <member type="way" ref="943701276" role=""/>
     <member type="way" ref="119006822" role=""/>
     <member type="way" ref="683815069" role=""/>
+    <member type="way" ref="1002818970" role=""/>
     <member type="way" ref="943678569" role=""/>
     <member type="way" ref="10085582" role=""/>
     <member type="way" ref="454043213" role=""/>

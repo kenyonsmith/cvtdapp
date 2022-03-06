@@ -20,12 +20,12 @@ from cvtdRouteStop import CvtdRouteStop
 class TestCvtdMap(unittest.TestCase):
 	def test_find_intersecting_roads(self):
 		myMap = CvtdMap()
-		myMap.nodeList.append(CvtdNode(1, 1))
-		myMap.nodeList.append(CvtdNode(4, 4))
-		myMap.nodeList.append(CvtdNode(1, 4))
-		myMap.nodeList.append(CvtdNode(4, 1))
-		myMap.nodeList.append(CvtdNode(3, 4))
-		myMap.nodeList.append(CvtdNode(4, 3))
+		myMap.nodeDict[0] = (CvtdNode(1, 1))
+		myMap.nodeDict[1] = (CvtdNode(4, 4))
+		myMap.nodeDict[2] = (CvtdNode(1, 4))
+		myMap.nodeDict[3] = (CvtdNode(4, 1))
+		myMap.nodeDict[4] = (CvtdNode(3, 4))
+		myMap.nodeDict[5] = (CvtdNode(4, 3))
 		
 		thisRoad = CvtdRoad()
 		thisRoad.name = "Road from 1,1 to 4,4"
@@ -61,13 +61,13 @@ class TestCvtdMap(unittest.TestCase):
 
 	def test_nonintersecting_roads(self):
 		myMap = CvtdMap()
-		myMap.nodeList.append(CvtdNode(1, 1))
-		myMap.nodeList.append(CvtdNode(2, 1))
-		myMap.nodeList.append(CvtdNode(1, 4))
-		myMap.nodeList.append(CvtdNode(2, 6))
-		myMap.nodeList.append(CvtdNode(2, 9))
-		myMap.nodeList.append(CvtdNode(3, 3))
-		myMap.nodeList.append(CvtdNode(4, 6))
+		myMap.nodeDict[0] = (CvtdNode(1, 1))
+		myMap.nodeDict[1] = (CvtdNode(2, 1))
+		myMap.nodeDict[2] = (CvtdNode(1, 4))
+		myMap.nodeDict[3] = (CvtdNode(2, 6))
+		myMap.nodeDict[4] = (CvtdNode(2, 9))
+		myMap.nodeDict[5] = (CvtdNode(3, 3))
+		myMap.nodeDict[6] = (CvtdNode(4, 6))
 		
 		thisRoad = CvtdRoad()
 		thisRoad.name = "Road from 1,1 to 2,9"
@@ -91,17 +91,17 @@ class TestCvtdMap(unittest.TestCase):
 
 	def test_multipoint_intersecting_roads(self):
 		myMap = CvtdMap()
-		myMap.nodeList.append(CvtdNode(1, 1))
-		myMap.nodeList.append(CvtdNode(1, 3))
-		myMap.nodeList.append(CvtdNode(1, 5))
-		myMap.nodeList.append(CvtdNode(3, 1))
-		myMap.nodeList.append(CvtdNode(3, 3))
-		myMap.nodeList.append(CvtdNode(3, 5))
+		myMap.nodeDict[0] = (CvtdNode(1, 1))
+		myMap.nodeDict[1] = (CvtdNode(1, 3))
+		myMap.nodeDict[2] = (CvtdNode(1, 5))
+		myMap.nodeDict[3] = (CvtdNode(3, 1))
+		myMap.nodeDict[4] = (CvtdNode(3, 3))
+		myMap.nodeDict[5] = (CvtdNode(3, 5))
 		
-		myMap.nodeList.append(CvtdNode(2, 2))
-		myMap.nodeList.append(CvtdNode(2, 4))
-		myMap.nodeList.append(CvtdNode(4, 4))
-		myMap.nodeList.append(CvtdNode(4, 2))
+		myMap.nodeDict[6] = (CvtdNode(2, 2))
+		myMap.nodeDict[7] = (CvtdNode(2, 4))
+		myMap.nodeDict[8] = (CvtdNode(4, 4))
+		myMap.nodeDict[9] = (CvtdNode(4, 2))
 		
 		thisRoad = CvtdRoad()
 		thisRoad.name = "Road from 1,1 to 3,5"
@@ -128,12 +128,12 @@ class TestCvtdMap(unittest.TestCase):
 	
 	# def test_sort_filter_intersections(self):
 	# 	myMap = CvtdMap()
-	# 	myMap.nodeList.append(CvtdNode(1, 1))
-	# 	myMap.nodeList.append(CvtdNode(4, 4))
-	# 	myMap.nodeList.append(CvtdNode(1, 4))
-	# 	myMap.nodeList.append(CvtdNode(4, 1))
-	# 	myMap.nodeList.append(CvtdNode(3, 4))
-	# 	myMap.nodeList.append(CvtdNode(4, 3))
+	# 	myMap.nodeDict[0] = (CvtdNode(1, 1))
+	# 	myMap.nodeDict[1] = (CvtdNode(4, 4))
+	# 	myMap.nodeDict[2] = (CvtdNode(1, 4))
+	# 	myMap.nodeDict[3] = (CvtdNode(4, 1))
+	# 	myMap.nodeDict[4] = (CvtdNode(3, 4))
+	# 	myMap.nodeDict[5] = (CvtdNode(4, 3))
 		
 	# 	thisRoad = CvtdRoad()
 	# 	thisRoad.name = "Road from 1,1 to 4,4"
@@ -174,12 +174,12 @@ class TestCvtdMap(unittest.TestCase):
 
 	def test_read_write_roads(self):
 		myMap = CvtdMap()
-		myMap.nodeList.append(CvtdNode(1, 1))
-		myMap.nodeList.append(CvtdNode(4, 4))
-		myMap.nodeList.append(CvtdNode(1, 4))
-		myMap.nodeList.append(CvtdNode(4, 1))
-		myMap.nodeList.append(CvtdNode(3, 4))
-		myMap.nodeList.append(CvtdNode(4, 3))
+		myMap.nodeDict[0] = (CvtdNode(1, 1))
+		myMap.nodeDict[1] = (CvtdNode(4, 4))
+		myMap.nodeDict[2] = (CvtdNode(1, 4))
+		myMap.nodeDict[3] = (CvtdNode(4, 1))
+		myMap.nodeDict[4] = (CvtdNode(3, 4))
+		myMap.nodeDict[5] = (CvtdNode(4, 3))
 		
 		thisRoad = CvtdRoad()
 		thisRoad.name = "Road from 0 to 60"
@@ -210,21 +210,21 @@ class TestCvtdMap(unittest.TestCase):
 		myCmpMap = CvtdMap()
 		myCmpMap.read_roads("tmp_roads.txt")
 
-		self.assertEqual(len(myMap.nodeList), len(myCmpMap.nodeList))
+		self.assertEqual(len(myMap.nodeDict), len(myCmpMap.nodeDict))
 		self.assertEqual(len(myMap.roadList), len(myCmpMap.roadList))
 
-		self.assertEqual(myMap.nodeList[0].lat, myCmpMap.nodeList[0].lat)
-		self.assertEqual(myMap.nodeList[0].lon, myCmpMap.nodeList[0].lon)
-		self.assertEqual(myMap.nodeList[1].lat, myCmpMap.nodeList[1].lat)
-		self.assertEqual(myMap.nodeList[1].lon, myCmpMap.nodeList[1].lon)
-		self.assertEqual(myMap.nodeList[2].lat, myCmpMap.nodeList[2].lat)
-		self.assertEqual(myMap.nodeList[2].lon, myCmpMap.nodeList[2].lon)
-		self.assertEqual(myMap.nodeList[3].lat, myCmpMap.nodeList[3].lat)
-		self.assertEqual(myMap.nodeList[3].lon, myCmpMap.nodeList[3].lon)
-		self.assertEqual(myMap.nodeList[4].lat, myCmpMap.nodeList[4].lat)
-		self.assertEqual(myMap.nodeList[4].lon, myCmpMap.nodeList[4].lon)
-		self.assertEqual(myMap.nodeList[5].lat, myCmpMap.nodeList[5].lat)
-		self.assertEqual(myMap.nodeList[5].lon, myCmpMap.nodeList[5].lon)
+		self.assertEqual(myMap.nodeDict[0].lat, myCmpMap.nodeDict[0].lat)
+		self.assertEqual(myMap.nodeDict[0].lon, myCmpMap.nodeDict[0].lon)
+		self.assertEqual(myMap.nodeDict[1].lat, myCmpMap.nodeDict[1].lat)
+		self.assertEqual(myMap.nodeDict[1].lon, myCmpMap.nodeDict[1].lon)
+		self.assertEqual(myMap.nodeDict[2].lat, myCmpMap.nodeDict[2].lat)
+		self.assertEqual(myMap.nodeDict[2].lon, myCmpMap.nodeDict[2].lon)
+		self.assertEqual(myMap.nodeDict[3].lat, myCmpMap.nodeDict[3].lat)
+		self.assertEqual(myMap.nodeDict[3].lon, myCmpMap.nodeDict[3].lon)
+		self.assertEqual(myMap.nodeDict[4].lat, myCmpMap.nodeDict[4].lat)
+		self.assertEqual(myMap.nodeDict[4].lon, myCmpMap.nodeDict[4].lon)
+		self.assertEqual(myMap.nodeDict[5].lat, myCmpMap.nodeDict[5].lat)
+		self.assertEqual(myMap.nodeDict[5].lon, myCmpMap.nodeDict[5].lon)
 
 		self.assertEqual(myMap.roadList[0].name, myCmpMap.roadList[0].name)
 		self.assertEqual(myMap.roadList[0].dir, myCmpMap.roadList[0].dir)

@@ -1,3 +1,7 @@
 cvtddata.txt
 key.txt
 __pycache__
+*.swp
+*.swo
+osm
+roads_2*

@@ -18,10 +18,10 @@ import direction
 from direction import Direction
 
 ####
-# print_print_list
+# print_print_list prints the print list which has been sorted
 #
-# print_list
-# count
+# print_list see description of print_list in add_to_print_list
+# count is the number of past positions we want to print
 ####
 def print_print_list(print_list, count):
 	for info in print_list:
@@ -67,16 +67,18 @@ def add_to_print_list(myMap, locator, print_list, rid, ix):
 		return
 
 	# Determine route
-	route = myMap.find_route_by_rid(rid)
 	try:
-		routeName = route.name
-		validStreets = route.get_street_list()
-	except AttributeError:
+		route = myMap.routeDict[rid]
+		routeName = route.routeShortName
+		# validStreets = route.get_street_list()
+	except KeyError:
 		routeName = "Unknown Route"
-		validStreets = None
+		# validStreets = None
+	validStreets = None
 
 	# Compute address
-	roadIx, addr, error = myMap.compute_addr_repr(lat, lon, validStreets)
+	# roadIx, addr, error = myMap.compute_addr_repr(lat, lon, validStreets)
+	roadIx, addr, error = myMap.compute_addr_repr(lat, lon, None)
 	if validStreets is not None and error > 250:
 		roadIx, addr_off_route, error_off_route = myMap.compute_addr_repr(lat, lon, None)
 		if error_off_route < 200:
@@ -121,7 +123,7 @@ def pull_data(key, locator):
 	for bus in root:
 		for i in range(NUM_ELEMENTS - 1, 0, -1):
 			try:
-				rid = int(bus[2].text)
+				rid = bus[2].text
 				bnum = bus[3].text
 				rnum = bus[4].text
 				route = bus[5].text
@@ -209,6 +211,7 @@ def get_filename(command):
 def show_help():
 	print("(1) Pull XML feed")
 	print("(2) List locator positions")
+	print("(3) Import Google directory")
 	print("(r) Read roads file")
 	print("(q) Quit")
 
@@ -224,10 +227,14 @@ def main():
 	locator.read_locator()
 	command = "help"
 	while command not in ["quit", "exit", "q", "e"]:
-		if command == "1":
+		if command == "":
+			pass
+		elif command == "1":
 			pull(myMap, locator, 1, key)
 		elif command[0] == "2":
 			list_locator(myMap, locator, command)
+		elif command == "3":
+			myMap.import_google_directory()
 		elif command.lower().strip().split()[0] in ['r', 'read', 'o', 'open']:
 			myMap.read_roads(get_filename(command))
 		else:

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.6" generator="Overpass API 0.7.56.9 76e5016d">
+<osm version="0.6" generator="Overpass API 0.7.57 93a4d346">
 <note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
-<meta osm_base="2021-07-25T05:44:13Z"/>
+<meta osm_base="2021-11-19T04:01:58Z"/>
 
   <node id="82882224" lat="41.6343720" lon="-111.8211191"/>
   <node id="82882228" lat="41.6339694" lon="-111.8210960"/>
@@ -49,7 +49,9 @@
   <node id="82917480" lat="41.6273829" lon="-111.8372939"/>
   <node id="82917482" lat="41.6274071" lon="-111.8387549"/>
   <node id="82917484" lat="41.6274382" lon="-111.8397773"/>
-  <node id="82917504" lat="41.6273138" lon="-111.8326293"/>
+  <node id="82917504" lat="41.6273138" lon="-111.8326290">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
   <node id="82917505" lat="41.6273579" lon="-111.8359570"/>
   <node id="82917640" lat="41.6323152" lon="-111.8219866"/>
   <node id="82917670" lat="41.6388348" lon="-111.8364569"/>
@@ -505,8 +507,6 @@
   <node id="4491256280" lat="41.6273878" lon="-111.8295072"/>
   <node id="4491256281" lat="41.6273301" lon="-111.8294910"/>
   <node id="4491256282" lat="41.6273301" lon="-111.8289299"/>
-  <node id="4491256283" lat="41.6273848" lon="-111.8289218"/>
-  <node id="4491256284" lat="41.6273848" lon="-111.8287145"/>
   <node id="4491256285" lat="41.6273301" lon="-111.8287145"/>
   <node id="4491256286" lat="41.6273271" lon="-111.8279949"/>
   <node id="4491256287" lat="41.6273787" lon="-111.8279908"/>
@@ -716,10 +716,10 @@
   <node id="4492957501" lat="41.6281647" lon="-111.8281544"/>
   <node id="4492957502" lat="41.6281098" lon="-111.8282331"/>
   <node id="4492957503" lat="41.6280741" lon="-111.8283297"/>
-  <node id="4492957504" lat="41.6280430" lon="-111.8295683"/>
-  <node id="4492957505" lat="41.6284410" lon="-111.8295727"/>
-  <node id="4492957506" lat="41.6284438" lon="-111.8291254"/>
-  <node id="4492957507" lat="41.6280457" lon="-111.8291210"/>
+  <node id="4492957504" lat="41.6280614" lon="-111.8295495"/>
+  <node id="4492957505" lat="41.6284594" lon="-111.8295535"/>
+  <node id="4492957506" lat="41.6284622" lon="-111.8291065"/>
+  <node id="4492957507" lat="41.6280641" lon="-111.8291025"/>
   <node id="4492957508" lat="41.6286179" lon="-111.8291505"/>
   <node id="4492957509" lat="41.6292945" lon="-111.8291490"/>
   <node id="4492957510" lat="41.6292950" lon="-111.8295523"/>
@@ -1158,7 +1158,7 @@
   <node id="5316951406" lat="41.6280609" lon="-111.8314525"/>
   <node id="5316951407" lat="41.6284250" lon="-111.8309932"/>
   <node id="5316951408" lat="41.6284249" lon="-111.8308609"/>
-  <node id="5316951410" lat="41.6287650" lon="-111.8316014"/>
+  <node id="5316951410" lat="41.6287634" lon="-111.8317030"/>
   <node id="5316951411" lat="41.6287610" lon="-111.8320172"/>
   <node id="5316951412" lat="41.6287610" lon="-111.8320992"/>
   <node id="5316951413" lat="41.6287630" lon="-111.8323401"/>
@@ -2479,6 +2479,14 @@
   <node id="8904791348" lat="41.6233874" lon="-111.8224586"/>
   <node id="8904791349" lat="41.6226913" lon="-111.8224524"/>
   <node id="8904791350" lat="41.6229793" lon="-111.8224550"/>
+  <node id="9222069478" lat="41.6273153" lon="-111.8324324">
+    <tag k="highway" v="stop"/>
+    <tag k="traffic_signals:direction" v="forward"/>
+  </node>
+  <node id="9222069479" lat="41.6273161" lon="-111.8327990">
+    <tag k="direction" v="backward"/>
+    <tag k="highway" v="stop"/>
+  </node>
   <way id="10080020">
     <nd ref="82882224"/>
     <nd ref="5318957163"/>
@@ -4200,6 +4208,7 @@
   <way id="452308929">
     <nd ref="82917504"/>
     <nd ref="5316951528"/>
+    <nd ref="9222069479"/>
     <nd ref="82917505"/>
     <nd ref="82917480"/>
     <nd ref="82917482"/>
@@ -4210,10 +4219,12 @@
     <nd ref="82917492"/>
     <nd ref="82917494"/>
     <nd ref="82913698"/>
-    <tag k="highway" v="residential"/>
+    <tag k="highway" v="unclassified"/>
     <tag k="lane_markings" v="no"/>
     <tag k="lanes" v="2"/>
+    <tag k="maxspeed" v="30 mph"/>
     <tag k="name" v="East 300 South"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="300"/>
@@ -4235,6 +4246,7 @@
     <tag k="highway" v="tertiary"/>
     <tag k="name" v="East 300 South"/>
     <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="300"/>
@@ -4422,8 +4434,6 @@
     <nd ref="4491256280"/>
     <nd ref="4491256281"/>
     <nd ref="4491256282"/>
-    <nd ref="4491256283"/>
-    <nd ref="4491256284"/>
     <nd ref="4491256285"/>
     <nd ref="4491256286"/>
     <nd ref="4491256287"/>
@@ -4470,11 +4480,6 @@
     <tag k="highway" v="service"/>
   </way>
   <way id="452308953">
-    <nd ref="4491256411"/>
-    <nd ref="4491256416"/>
-    <nd ref="4491256417"/>
-    <nd ref="5316951413"/>
-    <nd ref="4491256418"/>
     <nd ref="4491256419"/>
     <nd ref="4492957268"/>
     <nd ref="4491256436"/>
@@ -4488,7 +4493,6 @@
     <nd ref="4491256433"/>
     <nd ref="5316951464"/>
     <tag k="highway" v="service"/>
-    <tag k="service" v="parking_aisle"/>
   </way>
   <way id="452308954">
     <nd ref="4491256420"/>
@@ -4788,7 +4792,10 @@
     <nd ref="4492957506"/>
     <nd ref="4492957507"/>
     <nd ref="4492957504"/>
+    <tag k="access" v="yes"/>
     <tag k="building" v="school"/>
+    <tag k="leisure" v="swimming_pool"/>
+    <tag k="name" v="Mountain Crest Pool"/>
   </way>
   <way id="452506435">
     <nd ref="4492957508"/>
@@ -4810,6 +4817,7 @@
     <nd ref="4492957519"/>
     <nd ref="4492957520"/>
     <nd ref="4492957521"/>
+    <nd ref="5316951410"/>
     <nd ref="4492957522"/>
     <nd ref="4492957523"/>
     <nd ref="4492957524"/>
@@ -4844,7 +4852,7 @@
     <nd ref="4492957543"/>
     <nd ref="4492957544"/>
     <nd ref="4492957541"/>
-    <tag k="amenity" v="parking"/>
+    <tag k="amenity" v="driving_school"/>
   </way>
   <way id="452506439">
     <nd ref="4492957545"/>
@@ -5140,6 +5148,7 @@
     <tag k="highway" v="tertiary"/>
     <tag k="name" v="East 300 South"/>
     <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="300"/>
@@ -5791,7 +5800,7 @@
     <nd ref="5316951411"/>
     <nd ref="5316951412"/>
     <nd ref="5316951413"/>
-    <tag k="highway" v="service"/>
+    <tag k="highway" v="path"/>
   </way>
   <way id="550485308">
     <nd ref="5316951414"/>
@@ -7777,6 +7786,7 @@
   </way>
   <way id="753240522">
     <nd ref="7038037742"/>
+    <nd ref="9222069477"/>
     <nd ref="7038037741"/>
     <nd ref="4492957592"/>
     <nd ref="5320718844"/>
@@ -8673,12 +8683,14 @@
   <way id="962654364">
     <nd ref="4491256213"/>
     <nd ref="5316951432"/>
+    <nd ref="9222069478"/>
     <nd ref="5316951340"/>
     <nd ref="82917504"/>
     <tag k="highway" v="tertiary"/>
     <tag k="lane_markings" v="no"/>
     <tag k="lanes" v="2"/>
     <tag k="name" v="East 300 South"/>
+    <tag k="surface" v="asphalt"/>
     <tag k="tiger:cfcc" v="A41"/>
     <tag k="tiger:county" v="Cache, UT"/>
     <tag k="tiger:name_base" v="300"/>
@@ -8885,6 +8897,16 @@
     <tag k="admin_level" v="8"/>
     <tag k="boundary" v="administrative"/>
   </way>
+  <way id="1001878422">
+    <nd ref="4491256411"/>
+    <nd ref="4491256416"/>
+    <nd ref="4491256417"/>
+    <nd ref="5316951413"/>
+    <nd ref="4491256418"/>
+    <nd ref="4491256419"/>
+    <tag k="highway" v="service"/>
+    <tag k="service" v="parking_aisle"/>
+  </way>
   <relation id="198951">
     <member type="node" ref="8904833693" role="admin_centre"/>
     <member type="way" ref="658457321" role="inner"/>
@@ -8932,6 +8954,7 @@
     <member type="way" ref="687140395" role=""/>
     <member type="way" ref="687140398" role=""/>
     <member type="way" ref="943678569" role=""/>
+    <member type="way" ref="1002818970" role=""/>
     <member type="way" ref="10084841" role=""/>
     <member type="way" ref="10084514" role=""/>
     <member type="way" ref="10082986" role=""/>
@@ -8970,6 +8993,7 @@
     <member type="way" ref="943701276" role=""/>
     <member type="way" ref="119006822" role=""/>
     <member type="way" ref="683815069" role=""/>
+    <member type="way" ref="1002818970" role=""/>
     <member type="way" ref="943678569" role=""/>
     <member type="way" ref="10085582" role=""/>
     <member type="way" ref="454043213" role=""/>
